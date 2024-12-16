@@ -5,8 +5,9 @@ export async function onRequest(context) {
     // CORS 头
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
     };
 
     // 处理 OPTIONS 请求
@@ -15,77 +16,12 @@ export async function onRequest(context) {
     }
 
     try {
-        // 解析路径和ID
-        const path = url.pathname;
-        const matches = path.match(/^\/api\/reminders(?:\/(\d+))?$/);
-        if (!matches) {
-            return new Response('Invalid path', { 
-                status: 404, 
-                headers: { ...headers, 'Content-Type': 'application/json' }
-            });
-        }
-        const reminderId = matches[1];
-
         // GET 请求 - 获取所有提醒
         if (request.method === 'GET') {
             const { results } = await env.DB.prepare(
                 'SELECT * FROM reminders ORDER BY remind_time ASC'
             ).all();
-            return new Response(JSON.stringify(results), {
-                headers: { ...headers, 'Content-Type': 'application/json' },
-            });
-        }
-
-        // DELETE 请求 - 删除提醒
-        if (request.method === 'DELETE' && reminderId) {
-            console.log('Deleting reminder:', reminderId);
-            const body = await request.json();
-            const cronJobId = body.cronJobId;
-            console.log('Cron job ID:', cronJobId);
-
-            try {
-                // 删除数据库记录
-                const result = await env.DB.prepare(
-                    'DELETE FROM reminders WHERE id = ?'
-                ).bind(reminderId).run();
-
-                console.log('Database delete result:', result);
-
-                // 如果有cron job ID，也删除定时任务
-                if (cronJobId) {
-                    try {
-                        console.log('Deleting cron job:', cronJobId);
-                        const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
-                            }
-                        });
-
-                        const cronResponseText = await cronResponse.text();
-                        console.log('Cron job delete response:', cronResponseText);
-
-                        if (!cronResponse.ok) {
-                            console.error('Failed to delete cron job:', cronResponseText);
-                        }
-                    } catch (error) {
-                        console.error('Error deleting cron job:', error);
-                    }
-                }
-
-                return new Response(JSON.stringify({ success: true }), {
-                    headers: { ...headers, 'Content-Type': 'application/json' },
-                });
-            } catch (error) {
-                console.error('Error during deletion:', error);
-                return new Response(JSON.stringify({ 
-                    success: false, 
-                    error: error.message 
-                }), {
-                    status: 500,
-                    headers: { ...headers, 'Content-Type': 'application/json' },
-                });
-            }
+            return new Response(JSON.stringify(results), { headers });
         }
 
         // POST 请求 - 添加新提醒
@@ -94,7 +30,7 @@ export async function onRequest(context) {
             
             // 验证必要字段
             if (!reminder.title || !reminder.content || !reminder.remind_time || !reminder.cycle_type) {
-                return new Response('Missing required fields', {
+                return new Response(JSON.stringify({ error: 'Missing required fields' }), {
                     status: 400,
                     headers
                 });
@@ -230,12 +166,13 @@ export async function onRequest(context) {
                 // 即使创建定时任务失败，我们也保留提醒记录
             }
 
-            return new Response(JSON.stringify({ success: true }), {
-                headers: { ...headers, 'Content-Type': 'application/json' },
-            });
+            return new Response(JSON.stringify({ success: true }), { headers });
         }
 
-        return new Response('Method not allowed', { status: 405, headers });
+        return new Response(JSON.stringify({ error: 'Method not allowed' }), { 
+            status: 405, 
+            headers 
+        });
     } catch (error) {
         console.error('Error:', error);
         return new Response(JSON.stringify({
@@ -243,7 +180,7 @@ export async function onRequest(context) {
             error: error.message
         }), { 
             status: 500, 
-            headers: { ...headers, 'Content-Type': 'application/json' }
+            headers 
         });
     }
 } 
