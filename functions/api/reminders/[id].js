@@ -46,21 +46,35 @@ export async function onRequest(context) {
         if (cronJobId) {
             try {
                 console.log('Deleting cron job:', cronJobId);
-                const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
+                // 根据API文档，需要在URL中添加jobId参数
+                const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'DELETE',
                     headers: {
+                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
-                    }
+                    },
+                    body: JSON.stringify({
+                        jobId: parseInt(cronJobId)  // 确保jobId是数字
+                    })
                 });
 
                 const cronResponseText = await cronResponse.text();
                 console.log('Cron job delete response:', cronResponseText);
 
                 if (!cronResponse.ok) {
-                    console.error('Failed to delete cron job:', cronResponseText);
+                    const errorData = JSON.parse(cronResponseText);
+                    console.error('Failed to delete cron job:', errorData);
+                    throw new Error(`Failed to delete cron job: ${errorData.error || 'Unknown error'}`);
+                }
+
+                const responseData = JSON.parse(cronResponseText);
+                if (!responseData.success) {
+                    throw new Error(`Failed to delete cron job: ${responseData.error || 'Unknown error'}`);
                 }
             } catch (error) {
                 console.error('Error deleting cron job:', error);
+                // 即使删除定时任务失败，我们也继续返回成功
+                // 因为数据库记录已经删除了
             }
         }
 
