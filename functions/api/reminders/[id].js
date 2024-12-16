@@ -46,16 +46,11 @@ export async function onRequest(context) {
         if (cronJobId) {
             try {
                 console.log('Deleting cron job:', cronJobId);
-                // 根据API文档，需要在URL中添加jobId参数
-                const cronResponse = await fetch('https://api.cron-job.org/jobs', {
+                const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
                     method: 'DELETE',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        jobId: parseInt(cronJobId)  // 确保jobId是数字
-                    })
+                    }
                 });
 
                 const cronResponseText = await cronResponse.text();
