@@ -107,11 +107,17 @@ export async function onRequest(context) {
                             title: `Reminder: ${reminder.title}`,
                             enabled: true,
                             saveResponses: true,
-                            lastExecution: null,
+                            lastExecution: {
+                                time: Math.floor(Date.now() / 1000),
+                                statusCode: 200,
+                                duration: 0,
+                                output: "Initial setup"
+                            },
                             notifications: {
                                 onSuccess: true,
                                 onFailure: true,
-                                onDisable: true
+                                onDisable: true,
+                                onMissedSchedule: true
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
@@ -130,8 +136,13 @@ export async function onRequest(context) {
                             },
                             requestMethod: 0,
                             extendedData: {
-                                headers: []
-                            }
+                                headers: [],
+                                body: ""
+                            },
+                            auth: {
+                                enable: false
+                            },
+                            state: 1
                         }
                     })
                 });
