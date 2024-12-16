@@ -30,6 +30,7 @@
                     <label for="cycleType">循环类型:</label>
                     <select id="cycleType" required>
                         <option value="once">单次提醒</option>
+                        <option value="weekly">每周循环</option>
                         <option value="monthly">每月循环</option>
                         <option value="yearly">每年循环</option>
                     </select>
@@ -122,6 +123,7 @@
                 reminders.forEach(reminder => {
                     const cycleText = {
                         'once': '单次提醒',
+                        'weekly': '每周循环',
                         'monthly': '每月循环',
                         'yearly': '每年循环'
                     }[reminder.cycle_type] || '单次提醒';

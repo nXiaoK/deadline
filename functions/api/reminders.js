@@ -99,6 +99,18 @@ export async function onRequest(context) {
                 jobConfig.enabled = true;
                 jobConfig.stopOnError = false;
                 jobConfig.save_responses = true;
+            } else if (reminder.cycle_type === 'weekly') {
+                // 每周循环：只设置星期几和时间
+                const dayOfWeek = scheduleDate.getDay();
+                jobConfig.schedule = {
+                    timezone: 'Asia/Shanghai',
+                    hours: [scheduleDate.getHours()],
+                    minutes: [scheduleDate.getMinutes()],
+                    wdays: [dayOfWeek === 0 ? 7 : dayOfWeek],  // 将周日的0转换为7
+                    // 不设置 mdays 和 months，这样就会每周执行
+                    mdays: [], // 空数组表示每天都可能执行（由wdays控制）
+                    months: [] // 空数组表示每月都执行
+                };
             } else if (reminder.cycle_type === 'yearly') {
                 // 每年循环：设置固定的月份和日期
                 jobConfig.schedule = {
