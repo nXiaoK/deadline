@@ -56,6 +56,8 @@ export async function onRequest(context) {
             
             // 创建cron-job.org定时任务
             try {
+                console.log('Creating cron job for:', scheduleDate.toISOString());
+                
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
                     headers: {
@@ -67,14 +69,14 @@ export async function onRequest(context) {
                             url: notifyUrl,
                             title: `Reminder: ${reminder.title}`,
                             enabled: true,
-                            saveResponses: false,
+                            saveResponses: true,
                             schedule: {
                                 timezone: 'Asia/Shanghai',
+                                expiresAt: Math.floor(scheduleDate.getTime() / 1000) + 300, // 5分钟后过期
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
-                                months: [scheduleDate.getMonth() + 1],
-                                wdays: [scheduleDate.getDay()]
+                                months: [scheduleDate.getMonth() + 1]
                             },
                             requestMethod: 0, // 0 = GET
                             extendedData: {
@@ -84,13 +86,15 @@ export async function onRequest(context) {
                     })
                 });
 
+                const cronResponseText = await cronResponse.text();
+                console.log('Cron-job.org response:', cronResponseText);
+
                 if (!cronResponse.ok) {
-                    const error = await cronResponse.text();
-                    console.error('Cron-job.org API error:', error);
+                    console.error('Cron-job.org API error:', cronResponseText);
                     throw new Error('Failed to create cron job');
                 }
 
-                const cronResult = await cronResponse.json();
+                const cronResult = JSON.parse(cronResponseText);
                 
                 // 更新数据库中的定时任务ID
                 await env.DB.prepare(
@@ -110,6 +114,12 @@ export async function onRequest(context) {
         return new Response('Method not allowed', { status: 405, headers });
     } catch (error) {
         console.error('Error:', error);
-        return new Response(error.message, { status: 500, headers });
+        return new Response(JSON.stringify({
+            success: false,
+            error: error.message
+        }), { 
+            status: 500, 
+            headers: { ...headers, 'Content-Type': 'application/json' }
+        });
     }
 } 

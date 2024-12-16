@@ -6,7 +6,18 @@ export async function onRequest(context) {
     const key = url.searchParams.get('key');
     const reminderId = url.searchParams.get('id');
     
-    if (!key || key !== env.CRON_SECRET || !reminderId) {
+    // 如果是测试请求（没有id参数），返回成功响应
+    if (!reminderId) {
+        return new Response(JSON.stringify({ 
+            status: 'ok',
+            message: 'Notification endpoint is working'
+        }), {
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
+    // 验证密钥
+    if (!key || key !== env.CRON_SECRET) {
         return new Response('Unauthorized', { status: 401 });
     }
 
@@ -21,6 +32,7 @@ export async function onRequest(context) {
         }
 
         const reminder = results[0];
+        let notificationResults = [];
 
         // 发送到Telegram
         if (env.TG_BOT_TOKEN && env.TG_CHAT_ID) {
@@ -35,12 +47,15 @@ export async function onRequest(context) {
                     })
                 });
 
+                const tgResult = await tgResponse.json();
+                notificationResults.push({ platform: 'telegram', success: tgResponse.ok, result: tgResult });
+
                 if (!tgResponse.ok) {
-                    const error = await tgResponse.text();
-                    console.error('Telegram API error:', error);
+                    console.error('Telegram API error:', tgResult);
                 }
             } catch (error) {
                 console.error('Error sending Telegram message:', error);
+                notificationResults.push({ platform: 'telegram', success: false, error: error.message });
             }
         }
 
@@ -53,18 +68,26 @@ export async function onRequest(context) {
                         content: `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${new Date(reminder.remind_time).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`
                     }
                 };
-                const wecomResponse = await fetch(`https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=${env.WECOM_KEY}`, {
+
+                console.log('Sending WeCom message:', JSON.stringify(wecomMessage));
+                console.log('WeCom webhook URL:', env.WECOM_KEY);
+
+                const wecomResponse = await fetch(env.WECOM_KEY, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(wecomMessage)
                 });
 
+                const wecomResult = await wecomResponse.json();
+                console.log('WeCom response:', wecomResult);
+                notificationResults.push({ platform: 'wecom', success: wecomResponse.ok, result: wecomResult });
+
                 if (!wecomResponse.ok) {
-                    const error = await wecomResponse.text();
-                    console.error('WeCom API error:', error);
+                    console.error('WeCom API error:', wecomResult);
                 }
             } catch (error) {
                 console.error('Error sending WeCom message:', error);
+                notificationResults.push({ platform: 'wecom', success: false, error: error.message });
             }
         }
 
@@ -91,11 +114,21 @@ export async function onRequest(context) {
             }
         }
 
-        return new Response(JSON.stringify({ success: true }), {
+        return new Response(JSON.stringify({
+            success: true,
+            notifications: notificationResults
+        }), {
             headers: { 'Content-Type': 'application/json' }
         });
     } catch (error) {
         console.error('Notification error:', error);
-        return new Response(error.message, { status: 500 });
+        return new Response(JSON.stringify({
+            success: false,
+            error: error.message,
+            notifications: notificationResults
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 } 
