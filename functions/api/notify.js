@@ -98,8 +98,8 @@ export async function onRequest(context) {
             'UPDATE reminders SET status = 1 WHERE id = ?'
         ).bind(reminderId).run();
 
-        // 删除定时任务
-        if (reminder.cron_job_id && env.CRONJOB_API_KEY) {
+        // 只有单次提醒才删除定时任务
+        if (reminder.cycle_type === 'once' && reminder.cron_job_id && env.CRONJOB_API_KEY) {
             try {
                 const deleteResponse = await fetch(`https://api.cron-job.org/jobs/${reminder.cron_job_id}`, {
                     method: 'DELETE',
