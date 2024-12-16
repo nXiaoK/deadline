@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提醒事项管理</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>提醒事项管理</h1>
+        
+        <!-- 添加提醒表单 -->
+        <div class="add-form">
+            <h2>添加新提醒</h2>
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label for="title">项目名称:</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="content">项目内容:</label>
+                    <textarea id="content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="remindTime">提醒时间:</label>
+                    <input type="datetime-local" id="remindTime" required>
+                </div>
+                <button type="submit">添加提醒</button>
+            </form>
+        </div>
+
+        <!-- 提醒列表 -->
+        <div class="reminders-list">
+            <h2>提醒列表</h2>
+            <div id="remindersList"></div>
+        </div>
+    </div>
+
+    <script>
+        // 使用相对路径，自动适应当前域名
+        const API_BASE = '/api';
+        
+        // 格式化时间
+        function formatDateTime(date) {
+            const d = new Date(date);
+            return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+        }
+
+        // 添加提醒
+        async function addReminder(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const remindTime = document.getElementById('remindTime').value;
+
+            const reminder = {
+                id: Date.now().toString(),
+                title,
+                content,
+                remind_time: new Date(remindTime).toISOString(),
+                status: 0
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/reminders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(reminder)
+                });
+
+                if (response.ok) {
+                    alert('提醒添加成功！');
+                    document.getElementById('reminderForm').reset();
+                    loadReminders();
+                } else {
+                    const error = await response.text();
+                    throw new Error(error || '添加失败');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('添加提醒失败：' + error.message);
+            }
+        }
+
+        // 加载提醒列表
+        async function loadReminders() {
+            try {
+                const response = await fetch(`${API_BASE}/reminders`);
+                if (!response.ok) {
+                    throw new Error('加载失败');
+                }
+                const reminders = await response.json();
+                
+                const listElement = document.getElementById('remindersList');
+                listElement.innerHTML = '';
+
+                reminders.sort((a, b) => new Date(a.remind_time) - new Date(b.remind_time));
+
+                reminders.forEach(reminder => {
+                    const reminderElement = document.createElement('div');
+                    reminderElement.className = 'reminder-item';
+                    reminderElement.innerHTML = `
+                        <h3>${reminder.title}</h3>
+                        <p>${reminder.content}</p>
+                        <p>提醒时间: ${formatDateTime(reminder.remind_time)}</p>
+                        <p class="status">${reminder.status === 0 ? '待提醒' : '已提醒'}</p>
+                    `;
+                    listElement.appendChild(reminderElement);
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('加载提醒列表失败：' + error.message);
+            }
+        }
+
+        // 事件监听
+        document.getElementById('reminderForm').addEventListener('submit', addReminder);
+        
+        // 初始加载
+        loadReminders();
+
+        // 设置datetime-local的最小值为当前时间
+        const remindTimeInput = document.getElementById('remindTime');
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        remindTimeInput.min = now.toISOString().slice(0, 16);
+    </script>
+</body>
+</html> 
