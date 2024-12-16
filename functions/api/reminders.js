@@ -58,39 +58,55 @@ export async function onRequest(context) {
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
                 
+                // 确保时间在当前时间之后
+                const now = new Date();
+                const startDate = new Date(Math.max(now.getTime(), scheduleDate.getTime() - 60000)); // 提前1分钟开始
+                const endDate = new Date(scheduleDate.getTime() + 120000); // 结束时间设为提醒时间后2分钟
+
+                const jobData = {
+                    job: {
+                        url: notifyUrl,
+                        title: `Reminder: ${reminder.title}`,
+                        enabled: true,
+                        saveResponses: true,
+                        schedule: {
+                            timezone: 'Asia/Shanghai',
+                            hours: [scheduleDate.getHours()],
+                            minutes: [scheduleDate.getMinutes()],
+                            mdays: [scheduleDate.getDate()],
+                            months: [scheduleDate.getMonth() + 1],
+                            wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()],
+                            startsAt: {
+                                year: startDate.getFullYear(),
+                                month: startDate.getMonth() + 1,
+                                day: startDate.getDate(),
+                                hour: startDate.getHours(),
+                                minute: startDate.getMinutes()
+                            },
+                            expiresAt: {
+                                year: endDate.getFullYear(),
+                                month: endDate.getMonth() + 1,
+                                day: endDate.getDate(),
+                                hour: endDate.getHours(),
+                                minute: endDate.getMinutes()
+                            }
+                        },
+                        requestMethod: 0,
+                        extendedData: {
+                            headers: []
+                        }
+                    }
+                };
+
+                console.log('Creating job with data:', JSON.stringify(jobData, null, 2));
+
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
                     },
-                    body: JSON.stringify({
-                        job: {
-                            url: notifyUrl,
-                            title: `Reminder: ${reminder.title}`,
-                            enabled: true,
-                            saveResponses: true,
-                            schedule: {
-                                timezone: 'Asia/Shanghai',
-                                expiresAt: {
-                                    year: scheduleDate.getFullYear(),
-                                    month: scheduleDate.getMonth() + 1,
-                                    day: scheduleDate.getDate(),
-                                    hour: scheduleDate.getHours(),
-                                    minute: scheduleDate.getMinutes() + 1  // 设置为提醒时间后1分钟过期
-                                },
-                                hours: [scheduleDate.getHours()],
-                                minutes: [scheduleDate.getMinutes()],
-                                mdays: [scheduleDate.getDate()],
-                                months: [scheduleDate.getMonth() + 1],
-                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
-                            },
-                            requestMethod: 0,
-                            extendedData: {
-                                headers: []
-                            }
-                        }
-                    })
+                    body: JSON.stringify(jobData)
                 });
 
                 const cronResponseText = await cronResponse.text();
