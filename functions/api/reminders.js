@@ -59,7 +59,7 @@ export async function onRequest(context) {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
-                    method: 'POST',
+                    method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
@@ -70,22 +70,14 @@ export async function onRequest(context) {
                             title: `Reminder: ${reminder.title}`,
                             enabled: true,
                             saveResponses: true,
+                            lastExecution: null,
+                            notifications: {
+                                onSuccess: true,
+                                onFailure: true,
+                                onDisable: true
+                            },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                startsAt: {
-                                    year: scheduleDate.getFullYear(),
-                                    month: scheduleDate.getMonth() + 1,
-                                    day: scheduleDate.getDate(),
-                                    hour: scheduleDate.getHours(),
-                                    minute: scheduleDate.getMinutes()
-                                },
-                                expiresAt: {
-                                    year: scheduleDate.getFullYear(),
-                                    month: scheduleDate.getMonth() + 1,
-                                    day: scheduleDate.getDate(),
-                                    hour: scheduleDate.getHours(),
-                                    minute: scheduleDate.getMinutes() + 1
-                                },
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
@@ -93,10 +85,6 @@ export async function onRequest(context) {
                                 wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
                             },
                             requestMethod: 0,
-                            notifications: {
-                                onSuccess: true,
-                                onFailure: true
-                            },
                             extendedData: {
                                 headers: []
                             }
