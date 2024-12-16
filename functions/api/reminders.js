@@ -107,7 +107,6 @@ export async function onRequest(context) {
                             title: `Reminder: ${reminder.title}`,
                             enabled: true,
                             saveResponses: true,
-                            save: true,
                             lastExecution: null,
                             notifications: {
                                 onSuccess: true,
@@ -133,7 +132,8 @@ export async function onRequest(context) {
                             extendedData: {
                                 headers: []
                             }
-                        }
+                        },
+                        save: true
                     })
                 });
 
