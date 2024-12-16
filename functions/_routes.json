@@ -1,0 +1,11 @@
+{
+    "version": 1,
+    "include": ["/*"],
+    "exclude": [],
+    "cron": [
+        {
+            "pattern": "*/5 * * * *",
+            "function": "api/cron"
+        }
+    ]
+} 
