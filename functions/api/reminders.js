@@ -48,6 +48,60 @@ export async function onRequest(context) {
                 0
             ).run();
 
+            // 创建定时任务URL（包含认证信息）
+            const notifyUrl = `${url.origin}/api/notify?key=${env.CRON_SECRET}&id=${reminder.id}`;
+            
+            // 计算定时任务时间
+            const scheduleDate = new Date(reminder.remind_time);
+            
+            // 创建cron-job.org定时任务
+            try {
+                const cronResponse = await fetch('https://api.cron-job.org/jobs', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        job: {
+                            url: notifyUrl,
+                            title: `Reminder: ${reminder.title}`,
+                            enabled: true,
+                            saveResponses: false,
+                            schedule: {
+                                timezone: 'Asia/Shanghai',
+                                hours: [scheduleDate.getHours()],
+                                minutes: [scheduleDate.getMinutes()],
+                                mdays: [scheduleDate.getDate()],
+                                months: [scheduleDate.getMonth() + 1],
+                                wdays: [scheduleDate.getDay()]
+                            },
+                            requestMethod: 0, // 0 = GET
+                            extendedData: {
+                                headers: []
+                            }
+                        }
+                    })
+                });
+
+                if (!cronResponse.ok) {
+                    const error = await cronResponse.text();
+                    console.error('Cron-job.org API error:', error);
+                    throw new Error('Failed to create cron job');
+                }
+
+                const cronResult = await cronResponse.json();
+                
+                // 更新数据库中的定时任务ID
+                await env.DB.prepare(
+                    'UPDATE reminders SET cron_job_id = ? WHERE id = ?'
+                ).bind(cronResult.jobId, reminder.id).run();
+
+            } catch (error) {
+                console.error('Error creating cron job:', error);
+                // 即使创建定时任务失败，我们也保留提醒记录
+            }
+
             return new Response(JSON.stringify({ success: true }), {
                 headers: { ...headers, 'Content-Type': 'application/json' },
             });
