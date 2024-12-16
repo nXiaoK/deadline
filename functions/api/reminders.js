@@ -76,13 +76,14 @@ export async function onRequest(context) {
             // 根据循环类型设置不同的日期参数
             if (reminder.cycle_type === 'once') {
                 // 单次执行：设置具体的执行时间
+                const dayOfWeek = scheduleDate.getDay();
                 jobConfig.schedule = {
                     timezone: 'Asia/Shanghai',
-                    time: Math.floor(scheduleDate.getTime() / 1000), // Unix timestamp in seconds
                     hours: [scheduleDate.getHours()],
                     minutes: [scheduleDate.getMinutes()],
                     mdays: [scheduleDate.getDate()],
                     months: [scheduleDate.getMonth() + 1],
+                    wdays: [dayOfWeek === 0 ? 7 : dayOfWeek],  // 将周日的0转换为7
                     years: [scheduleDate.getFullYear()]
                 };
                 jobConfig.enabled = true;
