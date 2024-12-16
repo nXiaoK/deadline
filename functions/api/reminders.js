@@ -83,16 +83,35 @@ export async function onRequest(context) {
                     // 单次提醒：设置具体的日期、月份和星期几
                     schedule.mdays = [scheduleDate.getDate()];
                     schedule.months = [scheduleDate.getMonth() + 1];
-                    // 设置特定的星期几
-                    schedule.wdays = [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()];
-                    // 设置过期时间为执行后1分钟
-                    schedule.expiresAt = {
-                        year: scheduleDate.getFullYear(),
-                        month: scheduleDate.getMonth() + 1,
-                        day: scheduleDate.getDate(),
-                        hour: scheduleDate.getHours(),
-                        minute: scheduleDate.getMinutes() + 1
-                    };
+                    schedule.wdays = [1, 2, 3, 4, 5, 6, 7];  // 允许任何星期
+            }
+
+            // 创建定时任务的配置
+            const jobConfig = {
+                url: notifyUrl,
+                title: `Reminder: ${reminder.title} (${reminder.cycle_type})`,
+                enabled: true,
+                saveResponses: true,
+                lastExecution: null,
+                notifications: {
+                    onSuccess: true,
+                    onFailure: true,
+                    onDisable: true
+                },
+                schedule,
+                requestMethod: 0,
+                extendedData: {
+                    headers: []
+                }
+            };
+
+            // 如果是单次提醒，添加额外配置
+            if (reminder.cycle_type === 'once') {
+                jobConfig.stopOnError = false;  // 错误时不停止
+                jobConfig.save_responses = true;  // 保存响应
+                jobConfig.auth = {  // 添加认证信息
+                    enable: false
+                };
             }
 
             // 创建cron-job.org定时任务
@@ -106,25 +125,7 @@ export async function onRequest(context) {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
                     },
-                    body: JSON.stringify({
-                        job: {
-                            url: notifyUrl,
-                            title: `Reminder: ${reminder.title} (${reminder.cycle_type})`,
-                            enabled: true,
-                            saveResponses: true,
-                            lastExecution: null,
-                            notifications: {
-                                onSuccess: true,
-                                onFailure: true,
-                                onDisable: true
-                            },
-                            schedule,
-                            requestMethod: 0,
-                            extendedData: {
-                                headers: []
-                            }
-                        }
-                    })
+                    body: JSON.stringify({ job: jobConfig })
                 });
 
                 const cronResponseText = await cronResponse.text();
