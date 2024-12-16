@@ -16,7 +16,8 @@ export async function onRequest(context) {
 
     try {
         // 获取URL路径部分
-        const pathParts = url.pathname.split('/').filter(Boolean);
+        const pathParts = url.pathname.split('/');
+        const reminderId = pathParts[pathParts.length - 1];
         
         // GET 请求 - 获取所有提醒
         if (request.method === 'GET') {
@@ -29,37 +30,55 @@ export async function onRequest(context) {
         }
 
         // DELETE 请求 - 删除提醒
-        if (request.method === 'DELETE' && pathParts.length > 1) {
-            const reminderId = pathParts[1];
+        if (request.method === 'DELETE') {
+            console.log('Deleting reminder:', reminderId);
             const body = await request.json();
             const cronJobId = body.cronJobId;
+            console.log('Cron job ID:', cronJobId);
 
-            // 删除数据库记录
-            const result = await env.DB.prepare(
-                'DELETE FROM reminders WHERE id = ?'
-            ).bind(reminderId).run();
+            try {
+                // 删除数据库记录
+                const result = await env.DB.prepare(
+                    'DELETE FROM reminders WHERE id = ?'
+                ).bind(reminderId).run();
 
-            // 如果有cron job ID，也删除定时任务
-            if (cronJobId) {
-                try {
-                    const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
+                console.log('Database delete result:', result);
+
+                // 如果有cron job ID，也删除定时任务
+                if (cronJobId) {
+                    try {
+                        console.log('Deleting cron job:', cronJobId);
+                        const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
+                            }
+                        });
+
+                        const cronResponseText = await cronResponse.text();
+                        console.log('Cron job delete response:', cronResponseText);
+
+                        if (!cronResponse.ok) {
+                            console.error('Failed to delete cron job:', cronResponseText);
                         }
-                    });
-
-                    if (!cronResponse.ok) {
-                        console.error('Failed to delete cron job:', await cronResponse.text());
+                    } catch (error) {
+                        console.error('Error deleting cron job:', error);
                     }
-                } catch (error) {
-                    console.error('Error deleting cron job:', error);
                 }
-            }
 
-            return new Response(JSON.stringify({ success: true }), {
-                headers: { ...headers, 'Content-Type': 'application/json' },
-            });
+                return new Response(JSON.stringify({ success: true }), {
+                    headers: { ...headers, 'Content-Type': 'application/json' },
+                });
+            } catch (error) {
+                console.error('Error during deletion:', error);
+                return new Response(JSON.stringify({ 
+                    success: false, 
+                    error: error.message 
+                }), {
+                    status: 500,
+                    headers: { ...headers, 'Content-Type': 'application/json' },
+                });
+            }
         }
 
         // POST 请求 - 添加新提醒
