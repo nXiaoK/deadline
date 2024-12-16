@@ -79,6 +79,14 @@ export async function onRequest(context) {
                 const dayOfWeek = scheduleDate.getDay();
                 // 计算过期时间（执行时间后1分钟）
                 const expiryDate = new Date(scheduleDate.getTime() + 60000);
+                // 格式化为YYYYMMDDhhmmss
+                const expiresAt = expiryDate.getFullYear().toString() +
+                    String(expiryDate.getMonth() + 1).padStart(2, '0') +
+                    String(expiryDate.getDate()).padStart(2, '0') +
+                    String(expiryDate.getHours()).padStart(2, '0') +
+                    String(expiryDate.getMinutes()).padStart(2, '0') +
+                    String(expiryDate.getSeconds()).padStart(2, '0');
+
                 jobConfig.schedule = {
                     timezone: 'Asia/Shanghai',
                     hours: [scheduleDate.getHours()],
@@ -86,14 +94,7 @@ export async function onRequest(context) {
                     mdays: [scheduleDate.getDate()],
                     months: [scheduleDate.getMonth() + 1],
                     wdays: [dayOfWeek === 0 ? 7 : dayOfWeek],  // 将周日的0转换为7
-                    years: [scheduleDate.getFullYear()],
-                    expiresAt: {
-                        year: expiryDate.getFullYear(),
-                        month: expiryDate.getMonth() + 1,
-                        day: expiryDate.getDate(),
-                        hour: expiryDate.getHours(),
-                        minute: expiryDate.getMinutes()
-                    }
+                    expiresAt: parseInt(expiresAt)  // 转换为整数
                 };
                 jobConfig.enabled = true;
                 jobConfig.stopOnError = false;
