@@ -51,13 +51,15 @@ export async function onRequest(context) {
             // 创建定时任务URL（包含认证信息）
             const notifyUrl = `${url.origin}/api/notify?key=${env.CRON_SECRET}&id=${reminder.id}`;
             
-            // 计算定时任务时间（Unix时间戳，单位：秒）
+            // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
-            const timestamp = Math.floor(scheduleDate.getTime() / 1000);
+            // 计算结束时间（提醒时间后5分钟）
+            const expiryDate = new Date(scheduleDate.getTime() + 5 * 60000);
             
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
+                console.log('Expiry time:', expiryDate.toISOString());
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
@@ -73,8 +75,14 @@ export async function onRequest(context) {
                             saveResponses: true,
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                dates: [timestamp],
-                                expiresAt: timestamp + 300 // 5分钟后过期
+                                hours: [scheduleDate.getHours()],
+                                minutes: [scheduleDate.getMinutes()],
+                                mdays: [scheduleDate.getDate()],
+                                months: [scheduleDate.getMonth() + 1],
+                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()], // 将周日的0转换为7
+                                // 添加开始和结束时间
+                                startsAt: Math.floor(scheduleDate.getTime() / 1000),
+                                expiresAt: Math.floor(expiryDate.getTime() / 1000)
                             },
                             requestMethod: 0, // 0 = GET
                             extendedData: {
@@ -93,7 +101,6 @@ export async function onRequest(context) {
                 }
 
                 const cronResult = JSON.parse(cronResponseText);
-                console.log('Created cron job:', cronResult);
                 
                 // 更新数据库中的定时任务ID
                 await env.DB.prepare(
