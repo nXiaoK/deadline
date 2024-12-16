@@ -35,18 +35,13 @@ export async function onRequest(context) {
         const cronJobId = body.cronJobId;
         console.log('Cron job ID:', cronJobId);
 
-        // 删除数据库记录
-        const result = await env.DB.prepare(
-            'DELETE FROM reminders WHERE id = ?'
-        ).bind(reminderId).run();
+        let cronJobDeleted = false;
+        let cronJobError = null;
 
-        console.log('Database delete result:', result);
-
-        // 如果有cron job ID，也删除定时任务
+        // 如果有cron job ID，先尝试删除定时任务
         if (cronJobId) {
             try {
                 console.log('Deleting cron job:', cronJobId);
-                // 使用与创建任务相同的API基础URL
                 const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
                     method: 'DELETE',
                     headers: {
@@ -58,8 +53,7 @@ export async function onRequest(context) {
                 console.log('Cron job delete response:', responseText);
 
                 if (!cronResponse.ok) {
-                    console.error('Failed to delete cron job. Status:', cronResponse.status, 'Response:', responseText);
-                    throw new Error(`Failed to delete cron job: ${responseText}`);
+                    throw new Error(`Failed to delete cron job. Status: ${cronResponse.status}, Response: ${responseText}`);
                 }
 
                 try {
@@ -67,19 +61,41 @@ export async function onRequest(context) {
                     if (!responseData.success) {
                         throw new Error(responseData.error || 'Unknown error');
                     }
+                    cronJobDeleted = true;
                     console.log('Successfully deleted cron job:', cronJobId);
                 } catch (parseError) {
-                    console.error('Error parsing response:', parseError);
-                    throw new Error('Invalid response from cron-job.org');
+                    throw new Error(`Invalid response from cron-job.org: ${responseText}`);
                 }
             } catch (error) {
                 console.error('Error deleting cron job:', error);
-                // 即使删除定时任务失败，我们也继续返回成功
-                // 因为数据库记录已经删除了
+                cronJobError = error.message;
+                // 不立即返回错误，继续记录错误信息
             }
         }
 
-        return new Response(JSON.stringify({ success: true }), { headers });
+        // 只有在成功删除定时任务后（或没有定时任务需要删除时），才删除数据库记录
+        if (!cronJobId || cronJobDeleted) {
+            // 删除数据库记录
+            const result = await env.DB.prepare(
+                'DELETE FROM reminders WHERE id = ?'
+            ).bind(reminderId).run();
+
+            console.log('Database delete result:', result);
+
+            return new Response(JSON.stringify({ 
+                success: true,
+                message: 'Reminder and cron job deleted successfully'
+            }), { headers });
+        } else {
+            // 如果定时任务删除失败，返回错误
+            return new Response(JSON.stringify({ 
+                success: false, 
+                error: `Failed to delete cron job: ${cronJobError}`
+            }), { 
+                status: 500, 
+                headers 
+            });
+        }
     } catch (error) {
         console.error('Error during deletion:', error);
         return new Response(JSON.stringify({ 
