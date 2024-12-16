@@ -62,6 +62,34 @@
             return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
         }
 
+        // 删除提醒
+        async function deleteReminder(id, cronJobId) {
+            if (!confirm('确定要删除这个提醒吗？')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ cronJobId })
+                });
+
+                if (response.ok) {
+                    alert('提醒删除成功！');
+                    loadReminders();
+                } else {
+                    const error = await response.text();
+                    throw new Error(error || '删除失败');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('删除提醒失败：' + error.message);
+            }
+        }
+
         // 添加提醒
         async function addReminder(event) {
             event.preventDefault();
@@ -131,7 +159,10 @@
                     const reminderElement = document.createElement('div');
                     reminderElement.className = 'reminder-item';
                     reminderElement.innerHTML = `
-                        <h3>${reminder.title}</h3>
+                        <div class="reminder-header">
+                            <h3>${reminder.title}</h3>
+                            <button class="delete-btn" onclick="deleteReminder('${reminder.id}', '${reminder.cron_job_id}')">删除</button>
+                        </div>
                         <p>${reminder.content}</p>
                         <p>提醒时间: ${formatDateTime(reminder.remind_time)}</p>
                         <p>循环类型: ${cycleText}</p>

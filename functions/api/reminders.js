@@ -5,7 +5,7 @@ export async function onRequest(context) {
     // CORS 头
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
     };
 
@@ -15,12 +15,49 @@ export async function onRequest(context) {
     }
 
     try {
+        // 获取URL路径部分
+        const pathParts = url.pathname.split('/').filter(Boolean);
+        
         // GET 请求 - 获取所有提醒
         if (request.method === 'GET') {
             const { results } = await env.DB.prepare(
                 'SELECT * FROM reminders ORDER BY remind_time ASC'
             ).all();
             return new Response(JSON.stringify(results), {
+                headers: { ...headers, 'Content-Type': 'application/json' },
+            });
+        }
+
+        // DELETE 请求 - 删除提醒
+        if (request.method === 'DELETE' && pathParts.length > 1) {
+            const reminderId = pathParts[1];
+            const body = await request.json();
+            const cronJobId = body.cronJobId;
+
+            // 删除数据库记录
+            const result = await env.DB.prepare(
+                'DELETE FROM reminders WHERE id = ?'
+            ).bind(reminderId).run();
+
+            // 如果有cron job ID，也删除定时任务
+            if (cronJobId) {
+                try {
+                    const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
+                        }
+                    });
+
+                    if (!cronResponse.ok) {
+                        console.error('Failed to delete cron job:', await cronResponse.text());
+                    }
+                } catch (error) {
+                    console.error('Error deleting cron job:', error);
+                }
+            }
+
+            return new Response(JSON.stringify({ success: true }), {
                 headers: { ...headers, 'Content-Type': 'application/json' },
             });
         }
