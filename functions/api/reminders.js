@@ -54,9 +54,15 @@ export async function onRequest(context) {
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
             
-            // 获取24小时制的小时数
-            const hours = scheduleDate.getHours();
-            console.log('Original hours:', hours);
+            // 获取24小时制的小时数并转换为从0开始的12小时制
+            let hours = scheduleDate.getHours();
+            // 如果大于等于12点，减去12
+            if (hours >= 12) {
+                hours = hours - 12;
+            }
+            
+            console.log('Original 24h hours:', scheduleDate.getHours());
+            console.log('Converted 12h hours (0-11):', hours);
             
             // 创建cron-job.org定时任务
             try {
@@ -82,7 +88,7 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                hours: [hours],  // 直接使用24小时制的小时数
+                                hours: [hours],  // 使用从0开始的12小时制
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
                                 months: [scheduleDate.getMonth() + 1],
