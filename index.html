@@ -53,13 +53,13 @@
         // 格式化时间
         function formatDateTime(date) {
             const d = new Date(date);
-            return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+            return d.toLocaleString('zh-CN');
         }
 
         // 转换本地时间为UTC时间
         function localToUTC(dateString) {
             const date = new Date(dateString);
-            return date.toISOString();
+            return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
         }
 
         // 删除提醒
