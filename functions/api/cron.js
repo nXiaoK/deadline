@@ -1,5 +1,13 @@
 export async function onRequest(context) {
-    const { env } = context;
+    const { request, env } = context;
+
+    // 验证访问密钥
+    const url = new URL(request.url);
+    const key = url.searchParams.get('key');
+    
+    if (!key || key !== env.CRON_SECRET) {
+        return new Response('Unauthorized', { status: 401 });
+    }
 
     try {
         // 获取当前北京时间
@@ -25,7 +33,9 @@ export async function onRequest(context) {
 
         // 如果没有需要提醒的事项，直接返回
         if (!results || results.length === 0) {
-            return new Response('No reminders to process');
+            return new Response(JSON.stringify({ message: 'No reminders to process' }), {
+                headers: { 'Content-Type': 'application/json' }
+            });
         }
 
         // 处理每个提醒
@@ -84,9 +94,21 @@ export async function onRequest(context) {
             ).bind(reminder.id).run();
         }
 
-        return new Response(`Processed ${results.length} reminders`);
+        return new Response(JSON.stringify({
+            success: true,
+            processed: results.length,
+            message: `Processed ${results.length} reminders`
+        }), {
+            headers: { 'Content-Type': 'application/json' }
+        });
     } catch (error) {
         console.error('Cron job error:', error);
-        return new Response(error.message, { status: 500 });
+        return new Response(JSON.stringify({
+            success: false,
+            error: error.message
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 } 
