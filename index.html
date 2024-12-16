@@ -39,12 +39,18 @@
 
     <script>
         // 使用相对路径，自动适应当前域名
-        const API_BASE = '/api';
+        const API_BASE = '/api/reminders';
         
         // 格式化时间
         function formatDateTime(date) {
             const d = new Date(date);
             return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+        }
+
+        // 转换本地时间为UTC时间
+        function localToUTC(dateString) {
+            const date = new Date(dateString);
+            return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
         }
 
         // 添加提醒
@@ -59,12 +65,12 @@
                 id: Date.now().toString(),
                 title,
                 content,
-                remind_time: new Date(remindTime).toISOString(),
+                remind_time: localToUTC(remindTime),
                 status: 0
             };
 
             try {
-                const response = await fetch(`${API_BASE}/reminders`, {
+                const response = await fetch(API_BASE, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -72,13 +78,15 @@
                     body: JSON.stringify(reminder)
                 });
 
+                const responseText = await response.text();
+                console.log('Response:', responseText);
+
                 if (response.ok) {
                     alert('提醒添加成功！');
                     document.getElementById('reminderForm').reset();
                     loadReminders();
                 } else {
-                    const error = await response.text();
-                    throw new Error(error || '添加失败');
+                    throw new Error(responseText || '添加失败');
                 }
             } catch (error) {
                 console.error('Error:', error);
@@ -89,9 +97,10 @@
         // 加载提醒列表
         async function loadReminders() {
             try {
-                const response = await fetch(`${API_BASE}/reminders`);
+                const response = await fetch(API_BASE);
                 if (!response.ok) {
-                    throw new Error('加载失败');
+                    const error = await response.text();
+                    throw new Error(error || '加载失败');
                 }
                 const reminders = await response.json();
                 

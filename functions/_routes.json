@@ -4,7 +4,7 @@
     "exclude": [],
     "cron": [
         {
-            "pattern": "*/5 * * * *",
+            "pattern": "*/1 * * * *",
             "function": "api/cron"
         }
     ]
