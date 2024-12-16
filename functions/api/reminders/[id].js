@@ -56,13 +56,15 @@ export async function onRequest(context) {
                 const responseText = await cronResponse.text();
                 console.log('Cron job delete response:', responseText);
 
-                if (!cronResponse.ok) {
+                // 即使返回404（任务不存在）也视为成功
+                if (!cronResponse.ok && cronResponse.status !== 404) {
                     throw new Error(`Failed to delete cron job. Status: ${cronResponse.status}, Response: ${responseText}`);
                 }
 
                 console.log('Successfully deleted cron job:', cronJobId);
             } catch (error) {
                 console.error('Error deleting cron job:', error);
+                // 如果是网络错误等其他错误，仍然返回失败
                 return new Response(JSON.stringify({ 
                     success: false, 
                     error: `Failed to delete cron job: ${error.message}`
