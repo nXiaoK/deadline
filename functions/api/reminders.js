@@ -55,37 +55,6 @@ export async function onRequest(context) {
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
             
-            // 根据循环类型设置定时任务
-            const schedule = {
-                timezone: 'Asia/Shanghai',
-                hours: [scheduleDate.getHours()],
-                minutes: [scheduleDate.getMinutes()]
-            };
-
-            // 根据循环类型设置不同的日期参数
-            switch (reminder.cycle_type) {
-                case 'yearly':
-                    // 每年循环：设置固定的月份和日期
-                    schedule.mdays = [scheduleDate.getDate()];
-                    schedule.months = [scheduleDate.getMonth() + 1];
-                    // 设置所有星期几
-                    schedule.wdays = [1, 2, 3, 4, 5, 6, 7];
-                    break;
-                case 'monthly':
-                    // 每月循环：只设置固定的日期
-                    schedule.mdays = [scheduleDate.getDate()];
-                    // 所有月份
-                    schedule.months = Array.from({length: 12}, (_, i) => i + 1);
-                    // 设置所有星期几
-                    schedule.wdays = [1, 2, 3, 4, 5, 6, 7];
-                    break;
-                default:
-                    // 单次提醒：设置具体的日期、月份和星期几
-                    schedule.mdays = [scheduleDate.getDate()];
-                    schedule.months = [scheduleDate.getMonth() + 1];
-                    schedule.wdays = [1, 2, 3, 4, 5, 6, 7];  // 允许任何星期
-            }
-
             // 创建定时任务的配置
             const jobConfig = {
                 url: notifyUrl,
@@ -98,26 +67,53 @@ export async function onRequest(context) {
                     onFailure: true,
                     onDisable: true
                 },
-                schedule,
                 requestMethod: 0,
                 extendedData: {
                     headers: []
                 }
             };
 
-            // 如果是单次提醒，添加额外配置
+            // 根据循环类型设置不同的日期参数
             if (reminder.cycle_type === 'once') {
-                jobConfig.stopOnError = false;  // 错误时不停止
-                jobConfig.save_responses = true;  // 保存响应
-                jobConfig.auth = {  // 添加认证信息
-                    enable: false
+                // 单次执行：设置具体的执行时间
+                jobConfig.schedule = {
+                    timezone: 'Asia/Shanghai',
+                    time: Math.floor(scheduleDate.getTime() / 1000), // Unix timestamp in seconds
+                    hours: [scheduleDate.getHours()],
+                    minutes: [scheduleDate.getMinutes()],
+                    mdays: [scheduleDate.getDate()],
+                    months: [scheduleDate.getMonth() + 1],
+                    years: [scheduleDate.getFullYear()]
+                };
+                jobConfig.enabled = true;
+                jobConfig.stopOnError = false;
+                jobConfig.save_responses = true;
+            } else if (reminder.cycle_type === 'yearly') {
+                // 每年循环：设置固定的月份和日期
+                jobConfig.schedule = {
+                    timezone: 'Asia/Shanghai',
+                    hours: [scheduleDate.getHours()],
+                    minutes: [scheduleDate.getMinutes()],
+                    mdays: [scheduleDate.getDate()],
+                    months: [scheduleDate.getMonth() + 1],
+                    wdays: [1, 2, 3, 4, 5, 6, 7]  // 允许任何星期
+                };
+            } else {
+                // 每月循环：只设置固定的日期
+                jobConfig.schedule = {
+                    timezone: 'Asia/Shanghai',
+                    hours: [scheduleDate.getHours()],
+                    minutes: [scheduleDate.getMinutes()],
+                    mdays: [scheduleDate.getDate()],
+                    months: Array.from({length: 12}, (_, i) => i + 1),  // 所有月份
+                    wdays: [1, 2, 3, 4, 5, 6, 7]  // 允许任何星期
                 };
             }
 
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString(), 'with cycle type:', reminder.cycle_type);
-                console.log('Schedule settings:', JSON.stringify(schedule, null, 2));
+                console.log('Job config:', JSON.stringify(jobConfig, null, 2));
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
