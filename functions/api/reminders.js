@@ -76,7 +76,8 @@ export async function onRequest(context) {
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
-                                months: [scheduleDate.getMonth() + 1]
+                                months: [scheduleDate.getMonth() + 1],
+                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()] // 将周日的0转换为7
                             },
                             requestMethod: 0, // 0 = GET
                             extendedData: {
