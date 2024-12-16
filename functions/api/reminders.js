@@ -59,7 +59,8 @@ export async function onRequest(context) {
             const schedule = {
                 timezone: 'Asia/Shanghai',
                 hours: [scheduleDate.getHours()],
-                minutes: [scheduleDate.getMinutes()]
+                minutes: [scheduleDate.getMinutes()],
+                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()] // 将周日的0转换为7
             };
 
             // 根据循环类型设置不同的日期参数
@@ -68,15 +69,19 @@ export async function onRequest(context) {
                     // 每年循环：设置固定的月份和日期
                     schedule.mdays = [scheduleDate.getDate()];
                     schedule.months = [scheduleDate.getMonth() + 1];
+                    // 每年循环不需要星期几
+                    delete schedule.wdays;
                     break;
                 case 'monthly':
                     // 每月循环：只设置固定的日期
                     schedule.mdays = [scheduleDate.getDate()];
                     // 所有月份
                     schedule.months = Array.from({length: 12}, (_, i) => i + 1);
+                    // 每月循环不需要星期几
+                    delete schedule.wdays;
                     break;
                 default:
-                    // 单次提醒：设置具体的日期和月份
+                    // 单次提醒：设置具体的日期、月份和星期几
                     schedule.mdays = [scheduleDate.getDate()];
                     schedule.months = [scheduleDate.getMonth() + 1];
                     // 设置过期时间为执行后1分钟
@@ -92,6 +97,7 @@ export async function onRequest(context) {
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString(), 'with cycle type:', reminder.cycle_type);
+                console.log('Schedule settings:', JSON.stringify(schedule, null, 2));
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
