@@ -59,7 +59,7 @@ export async function onRequest(context) {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
@@ -93,6 +93,10 @@ export async function onRequest(context) {
                                 wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
                             },
                             requestMethod: 0,
+                            notifications: {
+                                onSuccess: true,
+                                onFailure: true
+                            },
                             extendedData: {
                                 headers: []
                             }
