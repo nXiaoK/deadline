@@ -54,31 +54,10 @@ export async function onRequest(context) {
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
             
-            // 输出时间信息用于调试
-            console.log('Original remind_time:', reminder.remind_time);
-            console.log('Schedule date ISO:', scheduleDate.toISOString());
-            console.log('Schedule date local:', scheduleDate.toString());
-            console.log('Hours (local):', scheduleDate.getHours());
-            console.log('UTC Hours:', scheduleDate.getUTCHours());
-            
-            // 获取时间组件
-            const hours = scheduleDate.getHours();
-            const minutes = scheduleDate.getMinutes();
-            const mday = scheduleDate.getDate();
-            const month = scheduleDate.getMonth() + 1;
-            const wday = scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay();
-
-            console.log('Cron schedule:', {
-                hours,
-                minutes,
-                mday,
-                month,
-                wday,
-                timezone: 'Asia/Shanghai'
-            });
-            
             // 创建cron-job.org定时任务
             try {
+                console.log('Creating cron job for:', scheduleDate.toISOString());
+                
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
                     headers: {
@@ -99,11 +78,11 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                hours: [hours],
-                                minutes: [minutes],
-                                mdays: [mday],
-                                months: [month],
-                                wdays: [wday]
+                                hours: [scheduleDate.getHours()],
+                                minutes: [scheduleDate.getMinutes()],
+                                mdays: [scheduleDate.getDate()],
+                                months: [scheduleDate.getMonth() + 1],
+                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
                             },
                             requestMethod: 0,
                             extendedData: {
