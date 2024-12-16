@@ -58,6 +58,10 @@ export async function onRequest(context) {
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
                 
+                // 计算到期时间：提醒时间后24小时
+                const expiresAt = new Date(scheduleDate);
+                expiresAt.setHours(expiresAt.getHours() + 24);
+
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
                     headers: {
@@ -72,14 +76,15 @@ export async function onRequest(context) {
                             saveResponses: true,
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                expiresAt: Math.floor(scheduleDate.getTime() / 1000) + 300, // 5分钟后过期
+                                expiresAt: Math.floor(expiresAt.getTime() / 1000),
+                                startsAt: Math.floor(scheduleDate.getTime() / 1000),
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
                                 months: [scheduleDate.getMonth() + 1],
-                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()] // 将周日的0转换为7
+                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
                             },
-                            requestMethod: 0, // 0 = GET
+                            requestMethod: 0,
                             extendedData: {
                                 headers: []
                             }
