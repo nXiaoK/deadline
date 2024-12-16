@@ -30,7 +30,7 @@ export async function onRequest(context) {
             const reminder = await request.json();
             
             // 验证必要字段
-            if (!reminder.title || !reminder.content || !reminder.remind_time) {
+            if (!reminder.title || !reminder.content || !reminder.remind_time || !reminder.cycle_type) {
                 return new Response('Missing required fields', {
                     status: 400,
                     headers
@@ -39,12 +39,13 @@ export async function onRequest(context) {
 
             // 插入数据
             await env.DB.prepare(
-                'INSERT INTO reminders (id, title, content, remind_time, status) VALUES (?, ?, ?, ?, ?)'
+                'INSERT INTO reminders (id, title, content, remind_time, cycle_type, status) VALUES (?, ?, ?, ?, ?, ?)'
             ).bind(
                 reminder.id,
                 reminder.title,
                 reminder.content,
                 reminder.remind_time,
+                reminder.cycle_type,
                 0
             ).run();
 
@@ -54,9 +55,43 @@ export async function onRequest(context) {
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
             
+            // 根据循环类型设置定时任务
+            const schedule = {
+                timezone: 'Asia/Shanghai',
+                hours: [scheduleDate.getHours()],
+                minutes: [scheduleDate.getMinutes()]
+            };
+
+            // 根据循环类型设置不同的日期参数
+            switch (reminder.cycle_type) {
+                case 'yearly':
+                    // 每年循环：设置固定的月份和日期
+                    schedule.mdays = [scheduleDate.getDate()];
+                    schedule.months = [scheduleDate.getMonth() + 1];
+                    break;
+                case 'monthly':
+                    // 每月循环：只设置固定的日期
+                    schedule.mdays = [scheduleDate.getDate()];
+                    // 所有月份
+                    schedule.months = Array.from({length: 12}, (_, i) => i + 1);
+                    break;
+                default:
+                    // 单次提醒：设置具体的日期和月份
+                    schedule.mdays = [scheduleDate.getDate()];
+                    schedule.months = [scheduleDate.getMonth() + 1];
+                    // 设置过期时间为执行后1分钟
+                    schedule.expiresAt = {
+                        year: scheduleDate.getFullYear(),
+                        month: scheduleDate.getMonth() + 1,
+                        day: scheduleDate.getDate(),
+                        hour: scheduleDate.getHours(),
+                        minute: scheduleDate.getMinutes() + 1
+                    };
+            }
+
             // 创建cron-job.org定时任务
             try {
-                console.log('Creating cron job for:', scheduleDate.toISOString());
+                console.log('Creating cron job for:', scheduleDate.toISOString(), 'with cycle type:', reminder.cycle_type);
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
@@ -67,7 +102,7 @@ export async function onRequest(context) {
                     body: JSON.stringify({
                         job: {
                             url: notifyUrl,
-                            title: `Reminder: ${reminder.title}`,
+                            title: `Reminder: ${reminder.title} (${reminder.cycle_type})`,
                             enabled: true,
                             saveResponses: true,
                             lastExecution: null,
@@ -76,14 +111,7 @@ export async function onRequest(context) {
                                 onFailure: true,
                                 onDisable: true
                             },
-                            schedule: {
-                                timezone: 'Asia/Shanghai',
-                                hours: [scheduleDate.getHours()],
-                                minutes: [scheduleDate.getMinutes()],
-                                mdays: [scheduleDate.getDate()],
-                                months: [scheduleDate.getMonth() + 1],
-                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
-                            },
+                            schedule,
                             requestMethod: 0,
                             extendedData: {
                                 headers: []

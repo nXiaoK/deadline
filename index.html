@@ -26,6 +26,14 @@
                     <label for="remindTime">提醒时间:</label>
                     <input type="datetime-local" id="remindTime" required>
                 </div>
+                <div class="form-group">
+                    <label for="cycleType">循环类型:</label>
+                    <select id="cycleType" required>
+                        <option value="once">单次提醒</option>
+                        <option value="monthly">每月循环</option>
+                        <option value="yearly">每年循环</option>
+                    </select>
+                </div>
                 <button type="submit">添加提醒</button>
             </form>
         </div>
@@ -60,12 +68,14 @@
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
             const remindTime = document.getElementById('remindTime').value;
+            const cycleType = document.getElementById('cycleType').value;
 
             const reminder = {
                 id: Date.now().toString(),
                 title,
                 content,
                 remind_time: localToUTC(remindTime),
+                cycle_type: cycleType,
                 status: 0
             };
 
@@ -110,12 +120,19 @@
                 reminders.sort((a, b) => new Date(a.remind_time) - new Date(b.remind_time));
 
                 reminders.forEach(reminder => {
+                    const cycleText = {
+                        'once': '单次提醒',
+                        'monthly': '每月循环',
+                        'yearly': '每年循环'
+                    }[reminder.cycle_type] || '单次提醒';
+
                     const reminderElement = document.createElement('div');
                     reminderElement.className = 'reminder-item';
                     reminderElement.innerHTML = `
                         <h3>${reminder.title}</h3>
                         <p>${reminder.content}</p>
                         <p>提醒时间: ${formatDateTime(reminder.remind_time)}</p>
+                        <p>循环类型: ${cycleText}</p>
                         <p class="status">${reminder.status === 0 ? '待提醒' : '已提醒'}</p>
                     `;
                     listElement.appendChild(reminderElement);
