@@ -53,10 +53,13 @@ export async function onRequest(context) {
             
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
+            // 计算过期时间（提醒时间后5分钟）
+            const expiryDate = new Date(scheduleDate.getTime() + 5 * 60000);
             
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
+                console.log('Expiry time:', expiryDate.toISOString());
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
@@ -78,6 +81,7 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
+                                expiresAt: Math.floor(expiryDate.getTime() / 1000),  // Unix时间戳（秒）
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
