@@ -53,7 +53,9 @@
         // 格式化时间
         function formatDateTime(date) {
             const d = new Date(date);
-            return d.toLocaleString('zh-CN');
+            // 使用时间戳减去8小时（8 * 60 * 60 * 1000 毫秒）
+            const adjustedDate = new Date(d.getTime() - 8 * 60 * 60 * 1000);
+            return adjustedDate.toLocaleString('zh-CN');
         }
 
         // 转换本地时间为UTC时间
