@@ -59,6 +59,7 @@ export async function onRequest(context) {
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', reminder.remind_time);
+                console.log('Parsed time:', { hours, minutes, year, month, day });
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
@@ -90,14 +91,7 @@ export async function onRequest(context) {
                             requestMethod: 0,
                             extendedData: {
                                 headers: []
-                            },
-                            auth: {
-                                enable: false
-                            },
-                            state: 0,
-                            requestTimeout: 30,
-                            created: Math.floor(Date.now() / 1000),
-                            modified: Math.floor(Date.now() / 1000)
+                            }
                         }
                     })
                 });
