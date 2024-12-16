@@ -53,15 +53,13 @@ export async function onRequest(context) {
             
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
-            // 计算过期时间（提醒时间后5分钟）
-            const expiryDate = new Date(scheduleDate.getTime() + 5 * 60000);
             
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
-                console.log('Expiry time:', expiryDate.toISOString());
                 
-                const cronResponse = await fetch('https://api.cron-job.org/jobs', {
+                // 创建第一个任务用于执行
+                const executionResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -81,7 +79,6 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                expiresAt: Math.floor(expiryDate.getTime() / 1000),  // Unix时间戳（秒）
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
@@ -96,24 +93,53 @@ export async function onRequest(context) {
                     })
                 });
 
-                const cronResponseText = await cronResponse.text();
-                console.log('Cron-job.org response:', cronResponseText);
+                const executionResponseText = await executionResponse.text();
+                console.log('Execution job response:', executionResponseText);
 
-                if (!cronResponse.ok) {
-                    console.error('Cron-job.org API error:', cronResponseText);
-                    throw new Error('Failed to create cron job');
+                if (!executionResponse.ok) {
+                    console.error('Cron-job.org API error:', executionResponseText);
+                    throw new Error('Failed to create execution job');
                 }
 
-                const cronResult = JSON.parse(cronResponseText);
-                console.log('Created cron job with ID:', cronResult.jobId);
+                const executionResult = JSON.parse(executionResponseText);
                 
+                // 创建第二个任务用于删除（5分钟后）
+                const deleteDate = new Date(scheduleDate.getTime() + 5 * 60000);
+                const deleteResponse = await fetch('https://api.cron-job.org/jobs', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        job: {
+                            url: `${url.origin}/api/delete-job?key=${env.CRON_SECRET}&jobId=${executionResult.jobId}`,
+                            title: `Delete: ${reminder.title}`,
+                            enabled: true,
+                            saveResponses: true,
+                            schedule: {
+                                timezone: 'Asia/Shanghai',
+                                hours: [deleteDate.getHours()],
+                                minutes: [deleteDate.getMinutes()],
+                                mdays: [deleteDate.getDate()],
+                                months: [deleteDate.getMonth() + 1],
+                                wdays: [deleteDate.getDay() === 0 ? 7 : deleteDate.getDay()]
+                            },
+                            requestMethod: 0
+                        }
+                    })
+                });
+
+                const deleteResponseText = await deleteResponse.text();
+                console.log('Delete job response:', deleteResponseText);
+
                 // 更新数据库中的定时任务ID
                 await env.DB.prepare(
                     'UPDATE reminders SET cron_job_id = ? WHERE id = ?'
-                ).bind(cronResult.jobId, reminder.id).run();
+                ).bind(executionResult.jobId, reminder.id).run();
 
             } catch (error) {
-                console.error('Error creating cron job:', error);
+                console.error('Error creating cron jobs:', error);
                 // 即使创建定时任务失败，我们也保留提醒记录
             }
 
