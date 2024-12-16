@@ -46,15 +46,18 @@ export async function onRequest(context) {
         if (cronJobId) {
             try {
                 console.log('Deleting cron job:', cronJobId);
-                // 构造删除URL，使用与创建任务相同的认证方式
-                const deleteUrl = `${url.origin}/api/notify?key=${env.CRON_SECRET}&id=${reminderId}`;
-                const cronResponse = await fetch(deleteUrl, {
-                    method: 'DELETE'
+                const cronResponse = await fetch(`https://api.cron-job.org/jobs/${cronJobId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${env.CRONJOB_API_KEY}`
+                    }
                 });
 
+                const responseText = await cronResponse.text();
+                console.log('Cron job delete response:', responseText);
+
                 if (!cronResponse.ok) {
-                    console.error('Failed to delete cron job:', await cronResponse.text());
-                    throw new Error('Failed to delete cron job');
+                    throw new Error(`Failed to delete cron job. Status: ${cronResponse.status}, Response: ${responseText}`);
                 }
 
                 console.log('Successfully deleted cron job:', cronJobId);

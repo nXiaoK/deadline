@@ -156,10 +156,14 @@ export async function onRequest(context) {
                 const cronResult = JSON.parse(cronResponseText);
                 console.log('Created cron job with ID:', cronResult.jobId);
                 
-                // 更新数据库中的定时任务ID
+                // 更新数据库中的定时任务ID（确保是整数）
+                const jobId = parseInt(cronResult.jobId);
+                if (isNaN(jobId)) {
+                    throw new Error('Invalid job ID returned from cron-job.org');
+                }
                 await env.DB.prepare(
                     'UPDATE reminders SET cron_job_id = ? WHERE id = ?'
-                ).bind(cronResult.jobId, reminder.id).run();
+                ).bind(jobId, reminder.id).run();
 
             } catch (error) {
                 console.error('Error creating cron job:', error);

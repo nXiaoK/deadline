@@ -37,7 +37,7 @@ export async function onRequest(context) {
         // 发送到Telegram
         if (env.TG_BOT_TOKEN && env.TG_CHAT_ID) {
             try {
-                const displayTime = new Date(new Date(reminder.remind_time).getTime() - 8 * 60 * 60 * 1000);
+                const displayTime = new Date(new Date(reminder.remind_time).getTime());
                 const tgMessage = `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}`;
                 const tgResponse = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
@@ -63,7 +63,7 @@ export async function onRequest(context) {
         // 发送到企业微信
         if (env.WECOM_KEY) {
             try {
-                const displayTime = new Date(new Date(reminder.remind_time).getTime() - 8 * 60 * 60 * 1000);
+                const displayTime = new Date(new Date(reminder.remind_time).getTime());
                 const wecomMessage = {
                     msgtype: 'text',
                     text: {
