@@ -55,45 +55,10 @@ export async function onRequest(context) {
             const [datePart, timePart] = reminder.remind_time.split('T');
             const [hours, minutes] = timePart.split(':').map(Number);
             const [year, month, day] = datePart.split('-').map(Number);
-
-            // 计算过期时间（执行时间后5分钟）
-            let expiryMinutes = minutes + 5;
-            let expiryHours = hours;
-            let expiryDay = day;
-            let expiryMonth = month;
-            let expiryYear = year;
-
-            // 处理分钟进位
-            if (expiryMinutes >= 60) {
-                expiryMinutes -= 60;
-                expiryHours += 1;
-            }
-            // 处理小时进位
-            if (expiryHours >= 24) {
-                expiryHours -= 24;
-                expiryDay += 1;
-            }
-            // 简单处理月份进位（假设每月30天）
-            if (expiryDay > 30) {
-                expiryDay = 1;
-                expiryMonth += 1;
-                if (expiryMonth > 12) {
-                    expiryMonth = 1;
-                    expiryYear += 1;
-                }
-            }
             
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', reminder.remind_time);
-                console.log('Parsed time:', { hours, minutes, year, month, day });
-                console.log('Expiry time:', { 
-                    year: expiryYear, 
-                    month: expiryMonth, 
-                    day: expiryDay, 
-                    hours: expiryHours, 
-                    minutes: expiryMinutes 
-                });
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
@@ -115,25 +80,25 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
+                                expiresAt: Math.floor(new Date(reminder.remind_time).getTime() / 1000) + 300,
                                 hours: [hours],
                                 minutes: [minutes],
                                 mdays: [day],
                                 months: [month],
-                                wdays: [(new Date(year, month - 1, day)).getDay() || 7],
-                                expiresAt: {
-                                    year: expiryYear,
-                                    month: expiryMonth,
-                                    day: expiryDay,
-                                    hour: expiryHours,
-                                    minute: expiryMinutes
-                                }
+                                wdays: [(new Date(year, month - 1, day)).getDay() || 7]
                             },
                             requestMethod: 0,
                             extendedData: {
                                 headers: []
-                            }
-                        },
-                        save: true
+                            },
+                            auth: {
+                                enable: false
+                            },
+                            state: 0,
+                            requestTimeout: 30,
+                            created: Math.floor(Date.now() / 1000),
+                            modified: Math.floor(Date.now() / 1000)
+                        }
                     })
                 });
 
