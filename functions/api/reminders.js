@@ -53,13 +53,10 @@ export async function onRequest(context) {
             
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
-            // 计算结束时间（提醒时间后5分钟）
-            const expiryDate = new Date(scheduleDate.getTime() + 5 * 60000);
             
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
-                console.log('Expiry time:', expiryDate.toISOString());
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
@@ -75,16 +72,20 @@ export async function onRequest(context) {
                             saveResponses: true,
                             schedule: {
                                 timezone: 'Asia/Shanghai',
+                                expiresAt: {
+                                    year: scheduleDate.getFullYear(),
+                                    month: scheduleDate.getMonth() + 1,
+                                    day: scheduleDate.getDate(),
+                                    hour: scheduleDate.getHours(),
+                                    minute: scheduleDate.getMinutes() + 1  // 设置为提醒时间后1分钟过期
+                                },
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
                                 months: [scheduleDate.getMonth() + 1],
-                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()], // 将周日的0转换为7
-                                // 添加开始和结束时间
-                                startsAt: Math.floor(scheduleDate.getTime() / 1000),
-                                expiresAt: Math.floor(expiryDate.getTime() / 1000)
+                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
                             },
-                            requestMethod: 0, // 0 = GET
+                            requestMethod: 0,
                             extendedData: {
                                 headers: []
                             }
