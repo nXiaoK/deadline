@@ -79,6 +79,8 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
+                                startsAt: Math.floor(scheduleDate.getTime() / 1000) - 30,  // 提前30秒开始
+                                expiresAt: Math.floor(scheduleDate.getTime() / 1000) + 60,  // 延后60秒过期
                                 hours: [scheduleDate.getHours()],
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
@@ -119,6 +121,7 @@ export async function onRequest(context) {
                             saveResponses: true,
                             schedule: {
                                 timezone: 'Asia/Shanghai',
+                                startsAt: Math.floor(deleteDate.getTime() / 1000) - 30,  // 提前30秒开始
                                 hours: [deleteDate.getHours()],
                                 minutes: [deleteDate.getMinutes()],
                                 mdays: [deleteDate.getDate()],
