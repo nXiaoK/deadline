@@ -54,20 +54,31 @@ export async function onRequest(context) {
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
             
-            // 获取24小时制的小时数并转换为从0开始的12小时制
-            let hours = scheduleDate.getHours();
-            // 如果大于等于12点，减去12
-            if (hours >= 12) {
-                hours = hours - 12;
-            }
+            // 输出时间信息用于调试
+            console.log('Original remind_time:', reminder.remind_time);
+            console.log('Schedule date ISO:', scheduleDate.toISOString());
+            console.log('Schedule date local:', scheduleDate.toString());
+            console.log('Hours (local):', scheduleDate.getHours());
+            console.log('UTC Hours:', scheduleDate.getUTCHours());
             
-            console.log('Original 24h hours:', scheduleDate.getHours());
-            console.log('Converted 12h hours (0-11):', hours);
+            // 获取时间组件
+            const hours = scheduleDate.getHours();
+            const minutes = scheduleDate.getMinutes();
+            const mday = scheduleDate.getDate();
+            const month = scheduleDate.getMonth() + 1;
+            const wday = scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay();
+
+            console.log('Cron schedule:', {
+                hours,
+                minutes,
+                mday,
+                month,
+                wday,
+                timezone: 'Asia/Shanghai'
+            });
             
             // 创建cron-job.org定时任务
             try {
-                console.log('Creating cron job for:', scheduleDate.toISOString());
-                
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
                     headers: {
@@ -88,11 +99,11 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                hours: [hours],  // 使用从0开始的12小时制
-                                minutes: [scheduleDate.getMinutes()],
-                                mdays: [scheduleDate.getDate()],
-                                months: [scheduleDate.getMonth() + 1],
-                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
+                                hours: [hours],
+                                minutes: [minutes],
+                                mdays: [mday],
+                                months: [month],
+                                wdays: [wday]
                             },
                             requestMethod: 0,
                             extendedData: {
@@ -112,13 +123,6 @@ export async function onRequest(context) {
 
                 const cronResult = JSON.parse(cronResponseText);
                 console.log('Created cron job with ID:', cronResult.jobId);
-                console.log('Schedule time:', {
-                    hours: hours,
-                    minutes: scheduleDate.getMinutes(),
-                    day: scheduleDate.getDate(),
-                    month: scheduleDate.getMonth() + 1,
-                    wday: scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()
-                });
                 
                 // 更新数据库中的定时任务ID
                 await env.DB.prepare(
