@@ -54,6 +54,10 @@ export async function onRequest(context) {
             // 计算定时任务时间
             const scheduleDate = new Date(reminder.remind_time);
             
+            // 获取24小时制的小时数
+            const hours = scheduleDate.getHours();
+            console.log('Original hours:', hours);
+            
             // 创建cron-job.org定时任务
             try {
                 console.log('Creating cron job for:', scheduleDate.toISOString());
@@ -78,7 +82,7 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                hours: [scheduleDate.getHours()],
+                                hours: [hours],  // 直接使用24小时制的小时数
                                 minutes: [scheduleDate.getMinutes()],
                                 mdays: [scheduleDate.getDate()],
                                 months: [scheduleDate.getMonth() + 1],
@@ -102,6 +106,13 @@ export async function onRequest(context) {
 
                 const cronResult = JSON.parse(cronResponseText);
                 console.log('Created cron job with ID:', cronResult.jobId);
+                console.log('Schedule time:', {
+                    hours: hours,
+                    minutes: scheduleDate.getMinutes(),
+                    day: scheduleDate.getDate(),
+                    month: scheduleDate.getMonth() + 1,
+                    wday: scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()
+                });
                 
                 // 更新数据库中的定时任务ID
                 await env.DB.prepare(
