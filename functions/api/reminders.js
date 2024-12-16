@@ -51,15 +51,12 @@ export async function onRequest(context) {
             // 创建定时任务URL（包含认证信息）
             const notifyUrl = `${url.origin}/api/notify?key=${env.CRON_SECRET}&id=${reminder.id}`;
             
-            // 解析时间字符串（格式：YYYY-MM-DDTHH:mm）
-            const [datePart, timePart] = reminder.remind_time.split('T');
-            const [hours, minutes] = timePart.split(':').map(Number);
-            const [year, month, day] = datePart.split('-').map(Number);
+            // 计算定时任务时间
+            const scheduleDate = new Date(reminder.remind_time);
             
             // 创建cron-job.org定时任务
             try {
-                console.log('Creating cron job for:', reminder.remind_time);
-                console.log('Parsed time:', { hours, minutes, year, month, day });
+                console.log('Creating cron job for:', scheduleDate.toISOString());
                 
                 const cronResponse = await fetch('https://api.cron-job.org/jobs', {
                     method: 'PUT',
@@ -81,12 +78,11 @@ export async function onRequest(context) {
                             },
                             schedule: {
                                 timezone: 'Asia/Shanghai',
-                                expiresAt: Math.floor(new Date(reminder.remind_time).getTime() / 1000) + 300,
-                                hours: [hours],
-                                minutes: [minutes],
-                                mdays: [day],
-                                months: [month],
-                                wdays: [(new Date(year, month - 1, day)).getDay() || 7]
+                                hours: [scheduleDate.getHours()],
+                                minutes: [scheduleDate.getMinutes()],
+                                mdays: [scheduleDate.getDate()],
+                                months: [scheduleDate.getMonth() + 1],
+                                wdays: [scheduleDate.getDay() === 0 ? 7 : scheduleDate.getDay()]
                             },
                             requestMethod: 0,
                             extendedData: {

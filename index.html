@@ -47,6 +47,12 @@
             return d.toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
         }
 
+        // 转换本地时间为UTC时间
+        function localToUTC(dateString) {
+            const date = new Date(dateString);
+            return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
+        }
+
         // 添加提醒
         async function addReminder(event) {
             event.preventDefault();
@@ -59,7 +65,7 @@
                 id: Date.now().toString(),
                 title,
                 content,
-                remind_time: remindTime,
+                remind_time: localToUTC(remindTime),
                 status: 0
             };
 
@@ -129,6 +135,7 @@
         // 设置datetime-local的最小值为当前时间
         const remindTimeInput = document.getElementById('remindTime');
         const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         remindTimeInput.min = now.toISOString().slice(0, 16);
     </script>
 </body>
