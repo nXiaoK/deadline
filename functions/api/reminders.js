@@ -15,10 +15,17 @@ export async function onRequest(context) {
     }
 
     try {
-        // 获取URL路径部分
-        const pathParts = url.pathname.split('/');
-        const reminderId = pathParts[pathParts.length - 1];
-        
+        // 解析路径和ID
+        const path = url.pathname;
+        const matches = path.match(/^\/api\/reminders(?:\/(\d+))?$/);
+        if (!matches) {
+            return new Response('Invalid path', { 
+                status: 404, 
+                headers: { ...headers, 'Content-Type': 'application/json' }
+            });
+        }
+        const reminderId = matches[1];
+
         // GET 请求 - 获取所有提醒
         if (request.method === 'GET') {
             const { results } = await env.DB.prepare(
@@ -30,7 +37,7 @@ export async function onRequest(context) {
         }
 
         // DELETE 请求 - 删除提醒
-        if (request.method === 'DELETE') {
+        if (request.method === 'DELETE' && reminderId) {
             console.log('Deleting reminder:', reminderId);
             const body = await request.json();
             const cronJobId = body.cronJobId;
