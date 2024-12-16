@@ -26,6 +26,8 @@
    - `TG_BOT_TOKEN`: Telegram机器人Token
    - `TG_CHAT_ID`: Telegram聊天ID
    - `WECOM_KEY`: 企业微信机器人Key
+   - `CRONJOB_API_KEY`: cron-job.org的API密钥（从 https://cron-job.org/en/members/api/ 获取）
+   - `CRON_SECRET`: 回调接口的密钥（可以自定义一个随机字符串）
 
 4. 创建D1数据库
    ```sql
