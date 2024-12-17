@@ -215,7 +215,7 @@ textarea {
     border-radius: 8px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     transition: all 0.5s ease-out;
-    border-top: 4px solid #e8e8e8;
+    border-top: 8px solid #e8e8e8;
     position: relative;
     z-index: 1;
 }
@@ -286,6 +286,7 @@ textarea {
 
 .reminder-card:hover::after {
     opacity: 1;
+    transform: translate(15px, 15px);
 }
 
 .card-header {
