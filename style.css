@@ -164,37 +164,29 @@ select {
     color: #1a1a1a;
 }
 
-/* 日期时间输入框特殊样式 */
+/* 日期时间输入框样式 */
 input[type="datetime-local"] {
-    position: relative;
-    padding-right: 40px;  /* 为图标留出空间 */
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1a1a1a;
+    background-color: #fafafa;
+    transition: all 0.3s;
     cursor: pointer;
-    font-family: inherit;  /* 使用系统字体 */
 }
 
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    background-color: transparent;
-    cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.3s;
+input[type="datetime-local"]:hover {
+    border-color: #40a9ff;
+    background-color: #fff;
 }
 
-input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
-    opacity: 1;
-}
-
-input[type="datetime-local"]::-webkit-inner-spin-button {
-    display: none;
-}
-
-input[type="datetime-local"]::-webkit-clear-button {
-    display: none;
+input[type="datetime-local"]:focus {
+    outline: none;
+    border-color: #1890ff;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 /* 占位符文本样式 */
@@ -660,47 +652,7 @@ textarea {
     fill: white;
 } 
 
-/* Semi UI DatePicker 自定义样式 */
-.semi-datepicker {
-    width: 100% !important;
-}
-
-.semi-datepicker-focused {
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
-}
-
-.semi-calendar-header {
-    padding: 16px !important;
-}
-
-.semi-calendar-grid {
-    padding: 8px !important;
-}
-
-.semi-calendar-date {
-    border-radius: 8px !important;
-    transition: all 0.3s !important;
-}
-
-.semi-calendar-date-selected {
-    background-color: #1890ff !important;
-}
-
-.semi-calendar-date:hover:not(.semi-calendar-date-selected) {
-    background-color: #f0f9ff !important;
-    color: #1890ff !important;
-}
-
-.semi-timepicker-popover {
-    border-radius: 12px !important;
-    overflow: hidden !important;
-}
-
-.semi-timepicker-content {
-    padding: 16px !important;
-}
-
-/* 快速时间选择按钮样式优化 */
+/* 快速时间选择按钮 */
 .time-shortcuts {
     display: flex;
     gap: 8px;
@@ -709,15 +661,14 @@ textarea {
 }
 
 .time-shortcut-btn {
-    padding: 6px 12px;
+    padding: 4px 12px;
     border: 1px solid #d9d9d9;
     border-radius: 6px;
     background-color: white;
     color: #666;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.3s;
-    line-height: 1.4;
 }
 
 .time-shortcut-btn:hover {
@@ -727,5 +678,5 @@ textarea {
 }
 
 .time-shortcut-btn:active {
-    transform: translateY(1px);
+    background-color: #e6f7ff;
 } 
