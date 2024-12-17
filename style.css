@@ -199,7 +199,7 @@ select:focus {
 }
 
 textarea {
-    height: 120px;
+    height: 90px;
     resize: vertical;
     line-height: 1.6;
 }
@@ -612,12 +612,12 @@ textarea {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background-color: #f5f5f5;
     transition: all 0.3s ease;
+    background-color: currentColor;
 }
 
 .type-icon svg {
-    fill: currentColor;
+    fill: white;
 }
 
 .type-icon.once {
@@ -635,15 +635,6 @@ textarea {
 .type-icon.yearly {
     color: #fa8c16;
 }
-
-.reminder-card:hover .type-icon {
-    transform: scale(1.1);
-    background-color: currentColor;
-}
-
-.reminder-card:hover .type-icon svg {
-    fill: white;
-} 
 
 /* 快速时间选择按钮 */
 .time-shortcuts {
