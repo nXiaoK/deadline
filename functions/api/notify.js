@@ -38,7 +38,13 @@ export async function onRequest(context) {
         if (env.TG_BOT_TOKEN && env.TG_CHAT_ID) {
             try {
                 const displayTime = new Date(new Date(reminder.remind_time).getTime());
-                const tgMessage = `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}`;
+                const cycleText = {
+                    'once': '单次提醒',
+                    'weekly': '每周循环',
+                    'monthly': '每月循环',
+                    'yearly': '每年循环'
+                }[reminder.cycle_type] || '单次提醒';
+                const tgMessage = `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}\n📅 循环类型：${cycleText}`;
                 const tgResponse = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -64,10 +70,16 @@ export async function onRequest(context) {
         if (env.WECOM_KEY) {
             try {
                 const displayTime = new Date(new Date(reminder.remind_time).getTime());
+                const cycleText = {
+                    'once': '单次提醒',
+                    'weekly': '每周循环',
+                    'monthly': '每月循环',
+                    'yearly': '每年循环'
+                }[reminder.cycle_type] || '单次提醒';
                 const wecomMessage = {
                     msgtype: 'text',
                     text: {
-                        content: `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}`
+                        content: `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}\n📅 循环类型：${cycleText}`
                     }
                 };
 
