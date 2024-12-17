@@ -328,9 +328,58 @@ textarea {
     }
 } 
 
-/* 确认和提示窗口样式 */
-.confirm-modal .modal-content,
-.alert-modal .modal-content {
+/* 提示条样式 */
+.toast {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.toast-icon {
+    fill: currentColor;
+}
+
+.toast.success .toast-icon {
+    color: #52c41a;
+}
+
+.toast.error .toast-icon {
+    color: #ff4d4f;
+}
+
+.toast.error .toast-content {
+    border-left: 4px solid #ff4d4f;
+}
+
+.toast.success .toast-content {
+    border-left: 4px solid #52c41a;
+}
+
+/* 确认窗口样式 */
+.confirm-modal .modal-content {
     max-width: 400px;
     padding: 0;
     border-radius: 8px;
@@ -380,8 +429,7 @@ textarea {
     transform: translateY(-1px);
 }
 
-.confirm-modal .cancel-btn,
-.alert-modal .cancel-btn {
+.confirm-modal .cancel-btn {
     background-color: #f0f0f0;
     color: #666;
     padding: 8px 16px;
@@ -392,8 +440,7 @@ textarea {
     transition: all 0.3s;
 }
 
-.confirm-modal .cancel-btn:hover,
-.alert-modal .cancel-btn:hover {
+.confirm-modal .cancel-btn:hover {
     background-color: #d9d9d9;
     transform: translateY(-1px);
 } 
