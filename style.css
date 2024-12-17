@@ -360,17 +360,8 @@ textarea {
     padding: 16px;
     border-bottom: 1px solid #333333;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-}
-
-.card-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    width: 100%;
 }
 
 .card-header h3 {
@@ -378,7 +369,6 @@ textarea {
     color: #000000;
     font-size: 20px;
     font-weight: 900;
-    text-align: center;
     display: -webkit-box;
     display: -moz-box;
     display: box;
@@ -390,6 +380,7 @@ textarea {
     box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: center;
 }
 
 .card-content {
@@ -459,6 +450,7 @@ textarea {
     padding: 2px 8px;
     border-radius: 10px;
     font-weight: 500;
+    flex-shrink: 0;
 }
 
 .status.pending {
@@ -682,6 +674,8 @@ textarea {
     display: flex;
     align-items: center;
     gap: 12px;
+    justify-content: center;
+    flex: 1;
 }
 
 .type-icon {
@@ -693,6 +687,7 @@ textarea {
     border-radius: 8px;
     transition: all 0.3s ease;
     background-color: currentColor;
+    flex-shrink: 0;
 }
 
 .type-icon svg {
