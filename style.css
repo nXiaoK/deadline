@@ -334,6 +334,16 @@ textarea {
     font-style: italic;
 }
 
+.time-text.next-remind.waiting {
+    color: #faad14;
+    font-weight: normal;
+    font-style: italic;
+}
+
+.time-text.next-remind.waiting .icon {
+    opacity: 0.8;
+}
+
 .time-text.next-remind.disabled .icon {
     opacity: 0.5;
 }
