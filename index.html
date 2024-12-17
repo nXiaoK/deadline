@@ -12,73 +12,75 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <div class="title-wrapper">
-                <a href="https://hugo.aliya.us.kg/" class="logo-link" target="_blank" rel="noopener noreferrer">
-                    <img src="logo.png" alt="网站Logo" class="logo">
-                </a>
-                <h1>提醒事项管理</h1>
-            </div>
-            <button id="openAddForm" class="add-button">添加新提醒</button>
-        </div>
-        
-        <!-- 弹出式添加提醒表单 -->
-        <div id="addFormModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>添加新提醒</h2>
-                    <span class="close">&times;</span>
+    <div class="grid-container">
+        <div class="container">
+            <div class="header">
+                <div class="title-wrapper">
+                    <a href="https://hugo.aliya.us.kg/" class="logo-link" target="_blank" rel="noopener noreferrer">
+                        <img src="logo.png" alt="网站Logo" class="logo">
+                    </a>
+                    <h1>提醒事项管理</h1>
                 </div>
-                <form id="reminderForm">
-                    <div class="form-group">
-                        <label for="title">项目名称:</label>
-                        <input type="text" id="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="link">链接地址:</label>
-                        <input type="url" id="link" placeholder="可选，例如: https://example.com">
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="content">项目内容:</label>
-                        <textarea id="content" required></textarea>
-                    </div>
-                    <div class="form-group full-width">
-                        <label for="remindTime">提醒时间:</label>
-                        <div class="time-shortcuts">
-                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(15)">15分钟后</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(30)">30分钟后</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(60)">1小时后</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(120)">2小时后</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setTomorrowMorning()">明早9点</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setTomorrowNoon()">明天中午12点</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setDaysLater(6)">6天后</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setDaysLater(29)">29天后</button>
-                            <button type="button" class="time-shortcut-btn" onclick="setDaysLater(364)">364天后</button>
-                        </div>
-                        <input type="datetime-local" 
-                               id="remindTime" 
-                               required>
-                    </div>
-                    <div class="form-group">
-                        <label for="cycleType">循环类型:</label>
-                        <select id="cycleType" required>
-                            <option value="once">单次提醒</option>
-                            <option value="weekly">每周循环</option>
-                            <option value="monthly">每月循环</option>
-                            <option value="yearly">每年循环</option>
-                        </select>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="submit-btn">添加提醒</button>
-                        <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
-                    </div>
-                </form>
+                <button id="openAddForm" class="add-button">添加新提醒</button>
             </div>
-        </div>
+            
+            <!-- 弹出式添加提醒表单 -->
+            <div id="addFormModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>添加新提醒</h2>
+                        <span class="close">&times;</span>
+                    </div>
+                    <form id="reminderForm">
+                        <div class="form-group">
+                            <label for="title">项目名称:</label>
+                            <input type="text" id="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="link">链接地址:</label>
+                            <input type="url" id="link" placeholder="可选，例如: https://example.com">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="content">项目内容:</label>
+                            <textarea id="content" required></textarea>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="remindTime">提醒时间:</label>
+                            <div class="time-shortcuts">
+                                <button type="button" class="time-shortcut-btn" onclick="setQuickTime(15)">15分钟后</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setQuickTime(30)">30分钟后</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setQuickTime(60)">1小时后</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setQuickTime(120)">2小时后</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setTomorrowMorning()">明早9点</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setTomorrowNoon()">明天中午12点</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setDaysLater(6)">6天后</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setDaysLater(29)">29天后</button>
+                                <button type="button" class="time-shortcut-btn" onclick="setDaysLater(364)">364天后</button>
+                            </div>
+                            <input type="datetime-local" 
+                                   id="remindTime" 
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cycleType">循环类型:</label>
+                            <select id="cycleType" required>
+                                <option value="once">单次提醒</option>
+                                <option value="weekly">每周循环</option>
+                                <option value="monthly">每月循环</option>
+                                <option value="yearly">每年循环</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="submit-btn">添加提醒</button>
+                            <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-        <!-- 提醒列表 -->
-        <div class="reminders-grid" id="remindersList"></div>
+            <!-- 提醒列表 -->
+            <div class="reminders-grid" id="remindersList"></div>
+        </div>
     </div>
 
     <!-- 自定义确认窗口 -->
@@ -169,7 +171,7 @@
             return new Date(date.getTime() - (date.getTimezoneOffset() * 60000)).toISOString();
         }
 
-        // 自定义确认窗口
+        // 自定义确���窗口
         let confirmResolve = null;
         
         function showConfirm(message) {
@@ -286,7 +288,7 @@
             const date = new Date(currentTime);
             const timestamp = date.getTime();
             
-            // 计算各个周期的毫秒��
+            // 计算各个周期的毫秒
             const DAY_MS = 24 * 60 * 60 * 1000;
             const WEEK_MS = 7 * DAY_MS;
             
