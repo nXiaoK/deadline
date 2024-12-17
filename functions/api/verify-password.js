@@ -7,6 +7,15 @@ export async function onRequest(context) {
     const { password } = await context.request.json();
     const correctPassword = context.env.PASSWORD;
 
+    if (!correctPassword) {
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
     if (password === correctPassword) {
       return new Response(JSON.stringify({ success: true }), {
         status: 200,

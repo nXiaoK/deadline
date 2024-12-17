@@ -32,7 +32,7 @@
             <button id="openAddForm" class="add-button">📑添加新提醒</button>
         </div>
 
-        <!-- ��出式添加提醒表单 -->
+        <!-- 出式添加提醒表单 -->
         <div id="addFormModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -544,9 +544,29 @@
 
         // 检查cookie
         window.onload = function() {
-            if (!document.cookie.includes('auth=true')) {
-                document.getElementById('password-overlay').style.display = 'flex';
-            }
+            // 先检查是否需要验证密码
+            fetch('/api/verify-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ password: '' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 如果服务器没有设置密码，直接设置cookie
+                    const expiryDate = new Date();
+                    expiryDate.setDate(expiryDate.getDate() + 30);
+                    document.cookie = `auth=true; expires=${expiryDate.toUTCString()}; path=/`;
+                } else if (!document.cookie.includes('auth=true')) {
+                    // 如果需要密码且没有验证过，显示密码输入框
+                    document.getElementById('password-overlay').style.display = 'flex';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking password requirement:', error);
+            });
         }
     </script>
 </body>
