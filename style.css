@@ -217,10 +217,10 @@ textarea {
     transition: all 0.3s ease;
     border-top: 4px solid #e8e8e8;
     position: relative;
-    z-index: 2;
+    z-index: 1;
 }
 
-.reminder-card::after {
+.reminder-card::before {
     content: '';
     position: absolute;
     top: 0;
@@ -231,46 +231,45 @@ textarea {
     border-radius: 8px;
     opacity: 0;
     transition: all 0.3s ease;
-    pointer-events: none;
-    z-index: 1;
+    z-index: -1;
+    background: white;
 }
 
 /* 不同类型的卡片主题色 */
 .reminder-card.theme-once {
     border-top-color: #1890ff;
 }
-.reminder-card.theme-once::after {
+.reminder-card.theme-once::before {
     border-color: #1890ff;
 }
 
 .reminder-card.theme-weekly {
     border-top-color: #52c41a;
 }
-.reminder-card.theme-weekly::after {
+.reminder-card.theme-weekly::before {
     border-color: #52c41a;
 }
 
 .reminder-card.theme-monthly {
     border-top-color: #722ed1;
 }
-.reminder-card.theme-monthly::after {
+.reminder-card.theme-monthly::before {
     border-color: #722ed1;
 }
 
 .reminder-card.theme-yearly {
     border-top-color: #fa8c16;
 }
-.reminder-card.theme-yearly::after {
+.reminder-card.theme-yearly::before {
     border-color: #fa8c16;
 }
 
 .reminder-card:hover {
     transform: translate(-5px, -5px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    background: white;
 }
 
-.reminder-card:hover::after {
+.reminder-card:hover::before {
     opacity: 1;
     transform: translate(5px, 5px);
 }
