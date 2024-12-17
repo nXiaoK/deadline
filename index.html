@@ -39,11 +39,11 @@
                         <label for="link">链接地址:</label>
                         <input type="url" id="link" placeholder="可选，例如: https://example.com">
                     </div>
-                    <div class="form-group">
+                    <div class="form-group full-width">
                         <label for="content">项目内容:</label>
                         <textarea id="content" required></textarea>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group full-width">
                         <label for="remindTime">提醒时间:</label>
                         <div class="time-shortcuts">
                             <button type="button" class="time-shortcut-btn" onclick="setQuickTime(15)">15分钟后</button>
@@ -286,7 +286,7 @@
             const date = new Date(currentTime);
             const timestamp = date.getTime();
             
-            // 计算各个周期的毫秒数
+            // 计算各个周期的毫秒��
             const DAY_MS = 24 * 60 * 60 * 1000;
             const WEEK_MS = 7 * DAY_MS;
             

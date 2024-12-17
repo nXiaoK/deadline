@@ -91,7 +91,7 @@ h1 {
     margin: 50px auto;
     padding: 0;
     width: 90%;
-    max-width: 500px;
+    max-width: 800px;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     animation: modalSlideIn 0.3s ease;
@@ -136,10 +136,17 @@ h1 {
 /* 表单样式 */
 form {
     padding: 24px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
 }
 
 .form-group {
-    margin-bottom: 24px;
+    margin-bottom: 0;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
 }
 
 label {
@@ -208,6 +215,7 @@ textarea {
 }
 
 .form-actions {
+    grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
@@ -519,6 +527,10 @@ textarea {
     .modal-content {
         width: 95%;
         margin: 20px auto;
+    }
+    
+    form {
+        grid-template-columns: 1fr;
     }
 } 
 
