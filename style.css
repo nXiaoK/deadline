@@ -214,8 +214,9 @@ textarea {
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease 0.1s;
+    transition: transform 0.3s ease;
     border-top: 8px solid #e8e8e8;
+    border: 2px solid transparent;
     position: relative;
     z-index: 1;
 }
@@ -229,18 +230,7 @@ textarea {
     bottom: -2px;
     border: 2px dashed #e8e8e8;
     border-radius: 8px;
-    opacity: 0;
-    transition: all 0.1s ease;
     z-index: -1;
-}
-
-.reminder-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-color: #ffffff;
-    border-radius: 8px;
-    z-index: 0;
 }
 
 .card-header,
@@ -257,11 +247,17 @@ textarea {
 .reminder-card.theme-once::after {
     border-color: #1890ff;
 }
+.reminder-card.theme-once:hover {
+    border-color: #1890ff;
+}
 
 .reminder-card.theme-weekly {
     border-top-color: #52c41a;
 }
 .reminder-card.theme-weekly::after {
+    border-color: #52c41a;
+}
+.reminder-card.theme-weekly:hover {
     border-color: #52c41a;
 }
 
@@ -271,11 +267,17 @@ textarea {
 .reminder-card.theme-monthly::after {
     border-color: #722ed1;
 }
+.reminder-card.theme-monthly:hover {
+    border-color: #722ed1;
+}
 
 .reminder-card.theme-yearly {
     border-top-color: #fa8c16;
 }
 .reminder-card.theme-yearly::after {
+    border-color: #fa8c16;
+}
+.reminder-card.theme-yearly:hover {
     border-color: #fa8c16;
 }
 
@@ -286,7 +288,7 @@ textarea {
 
 .reminder-card:hover::after {
     opacity: 1;
-    transform: translate(15px, 15px);
+    transform: none;
 }
 
 .card-header {
