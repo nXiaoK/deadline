@@ -130,10 +130,44 @@
     <script>
         let authToken = '';
         const passwordModal = document.getElementById('passwordModal');
+        const STORAGE_KEY = 'deadline_auth';
+        const EXPIRE_DAYS = 30;
+        
+        // 检查存储的密码是否有效
+        function checkStoredPassword() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const { password, expireTime } = JSON.parse(stored);
+                    if (new Date().getTime() < expireTime) {
+                        return password;
+                    } else {
+                        localStorage.removeItem(STORAGE_KEY);
+                    }
+                } catch (error) {
+                    localStorage.removeItem(STORAGE_KEY);
+                }
+            }
+            return null;
+        }
+
+        // 保存密码到本地存储
+        function savePassword(password) {
+            const expireTime = new Date().getTime() + (EXPIRE_DAYS * 24 * 60 * 60 * 1000);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify({
+                password,
+                expireTime
+            }));
+        }
         
         // 显示密码输入框
         function showPasswordModal() {
-            passwordModal.style.display = "block";
+            const storedPassword = checkStoredPassword();
+            if (storedPassword) {
+                verifyPassword(storedPassword);
+            } else {
+                passwordModal.style.display = "block";
+            }
         }
 
         // 验证密码
@@ -148,10 +182,12 @@
                 if (response.ok) {
                     authToken = password;
                     passwordModal.style.display = "none";
+                    savePassword(password);  // 保存有效的密码
                     loadReminders();
                     return true;
                 } else {
                     showToast('密码错误，请重试', 'error');
+                    localStorage.removeItem(STORAGE_KEY);  // 移除无效的密码
                     return false;
                 }
             } catch (error) {
