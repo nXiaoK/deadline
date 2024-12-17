@@ -14,6 +14,13 @@
 </head>
 
 <body>
+    <!-- 在body开始处添加密码验证层 -->
+    <div id="password-overlay" class="password-overlay">
+        <div class="password-container">
+            <input type="password" id="password-input" placeholder="请输入密码">
+            <button onclick="verifyPassword()">确认</button>
+        </div>
+    </div>
     <div class="container">
         <div class="header">
             <div class="title-wrapper">
@@ -508,6 +515,39 @@
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         remindTimeInput.min = now.toISOString().slice(0, 16);
+
+        // 添加密码验证相关函数
+        async function verifyPassword() {
+            const password = document.getElementById('password-input').value;
+            try {
+                const response = await fetch('/api/verify-password', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password })
+                });
+                
+                if (response.ok) {
+                    document.getElementById('password-overlay').style.display = 'none';
+                    // 设置cookie，有效期30天
+                    const expiryDate = new Date();
+                    expiryDate.setDate(expiryDate.getDate() + 30);
+                    document.cookie = `auth=true; expires=${expiryDate.toUTCString()}; path=/`;
+                } else {
+                    alert('密码错误');
+                }
+            } catch (error) {
+                alert('验证失败，请重试');
+            }
+        }
+
+        // 检查cookie
+        window.onload = function() {
+            if (!document.cookie.includes('auth=true')) {
+                document.getElementById('password-overlay').style.display = 'flex';
+            }
+        }
     </script>
 </body>
 
