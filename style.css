@@ -230,7 +230,7 @@ textarea {
     border: 2px dashed #e8e8e8;
     border-radius: 8px;
     opacity: 0;
-    transition: all 0.3s ease;
+    transition: all 0s ease;
     z-index: -1;
 }
 
