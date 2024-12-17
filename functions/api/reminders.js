@@ -38,14 +38,15 @@ export async function onRequest(context) {
 
             // 插入数据
             await env.DB.prepare(
-                'INSERT INTO reminders (id, title, content, remind_time, cycle_type, status) VALUES (?, ?, ?, ?, ?, ?)'
+                'INSERT INTO reminders (id, title, content, remind_time, cycle_type, status, link) VALUES (?, ?, ?, ?, ?, ?, ?)'
             ).bind(
                 reminder.id,
                 reminder.title,
                 reminder.content,
                 reminder.remind_time,
                 reminder.cycle_type,
-                0
+                0,
+                reminder.link
             ).run();
 
             // 创建定时任务URL（包含认证信息）
