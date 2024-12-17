@@ -209,6 +209,40 @@ textarea {
     margin-top: 35px;
 }
 
+/* 卡片容器 */
+.card-container {
+    position: relative;
+}
+
+/* 虚线边框 */
+.dashed-border {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 2px dashed #e8e8e8;
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+/* 不同类型的虚线边框颜色 */
+.theme-once .dashed-border {
+    border-color: #1890ff;
+}
+
+.theme-weekly .dashed-border {
+    border-color: #52c41a;
+}
+
+.theme-monthly .dashed-border {
+    border-color: #722ed1;
+}
+
+.theme-yearly .dashed-border {
+    border-color: #fa8c16;
+}
+
 /* 提醒卡片样式 */
 .reminder-card {
     background-color: #ffffff;
@@ -216,28 +250,7 @@ textarea {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     border-top: 8px solid #e8e8e8;
-    border: 2px solid transparent;
-    position: relative;
-    z-index: 1;
-}
-
-.reminder-card::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    border: 2px dashed #e8e8e8;
-    border-radius: 8px;
-    z-index: -1;
-    pointer-events: none;
-    transform: translate(15px, 15px);
-}
-
-.card-header,
-.card-content,
-.card-actions {
+    border: 2px solid #e8e8e8;
     position: relative;
     z-index: 1;
 }
@@ -245,47 +258,34 @@ textarea {
 /* 不同类型的卡片主题色 */
 .reminder-card.theme-once {
     border-top-color: #1890ff;
-}
-.reminder-card.theme-once::before {
-    border-color: #1890ff;
-}
-.reminder-card.theme-once:hover {
     border-color: #1890ff;
 }
 
 .reminder-card.theme-weekly {
     border-top-color: #52c41a;
-}
-.reminder-card.theme-weekly::before {
-    border-color: #52c41a;
-}
-.reminder-card.theme-weekly:hover {
     border-color: #52c41a;
 }
 
 .reminder-card.theme-monthly {
     border-top-color: #722ed1;
-}
-.reminder-card.theme-monthly::before {
-    border-color: #722ed1;
-}
-.reminder-card.theme-monthly:hover {
     border-color: #722ed1;
 }
 
 .reminder-card.theme-yearly {
     border-top-color: #fa8c16;
-}
-.reminder-card.theme-yearly::before {
-    border-color: #fa8c16;
-}
-.reminder-card.theme-yearly:hover {
     border-color: #fa8c16;
 }
 
 .reminder-card:hover {
     transform: translate(-15px, -15px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-header,
+.card-content,
+.card-actions {
+    position: relative;
+    z-index: 1;
 }
 
 .card-header {
