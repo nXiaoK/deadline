@@ -39,7 +39,10 @@
                     </div>
                     <div class="form-group">
                         <label for="remindTime">提醒时间:</label>
-                        <input type="datetime-local" id="remindTime" required>
+                        <input type="datetime-local" 
+                               id="remindTime" 
+                               required 
+                               placeholder="选择日期和时间">
                     </div>
                     <div class="form-group">
                         <label for="cycleType">循环类型:</label>
@@ -208,7 +211,7 @@
                     closeModal();
                     loadReminders();
                 } else {
-                    throw new Error(responseText || '添加失败');
+                    throw new Error(responseText || '添加��败');
                 }
             } catch (error) {
                 console.error('Error:', error);

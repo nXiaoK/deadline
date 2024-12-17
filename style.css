@@ -161,6 +161,51 @@ select {
     font-size: 14px;
     transition: all 0.3s;
     background-color: #fafafa;
+    color: #1a1a1a;
+}
+
+/* 日期时间输入框特殊样式 */
+input[type="datetime-local"] {
+    position: relative;
+    padding-right: 40px;  /* 为图标留出空间 */
+    cursor: pointer;
+    font-family: inherit;  /* 使用系统字体 */
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+}
+
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+input[type="datetime-local"]::-webkit-inner-spin-button {
+    display: none;
+}
+
+input[type="datetime-local"]::-webkit-clear-button {
+    display: none;
+}
+
+/* 占位符文本样式 */
+input::placeholder,
+textarea::placeholder {
+    color: #bfbfbf;
+}
+
+input:hover::placeholder,
+textarea:hover::placeholder {
+    color: #8c8c8c;
 }
 
 input[type="text"]:hover,
