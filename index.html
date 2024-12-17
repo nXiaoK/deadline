@@ -545,7 +545,14 @@
 
         // 检查cookie
         window.onload = function() {
-            // 先检查是否需要验证密码
+            // 如果已经有 auth cookie，直接移除锁定状态
+            if (document.cookie.includes('auth=true')) {
+                document.getElementById('password-overlay').style.display = 'none';
+                document.body.classList.remove('locked');
+                return; // 直接返回，不再进行验证
+            }
+
+            // 只有在没有 auth cookie 的情况下才检查密码
             fetch('/api/verify-password', {
                 method: 'POST',
                 headers: {
@@ -560,11 +567,11 @@
                     const expiryDate = new Date();
                     expiryDate.setDate(expiryDate.getDate() + 30);
                     document.cookie = `auth=true; expires=${expiryDate.toUTCString()}; path=/`;
-                    document.body.classList.remove('locked'); // 移除锁定
-                } else if (!document.cookie.includes('auth=true')) {
+                    document.body.classList.remove('locked');
+                } else {
                     // 如果需要密码且没有验证过，显示密码输入框
                     document.getElementById('password-overlay').style.display = 'flex';
-                    document.body.classList.add('locked'); // 添加锁定
+                    document.body.classList.add('locked');
                 }
             })
             .catch(error => {
