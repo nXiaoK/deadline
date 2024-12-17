@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -22,25 +24,8 @@
             </div>
             <button id="openAddForm" class="add-button">📑添加新提醒</button>
         </div>
-        
-        <!-- 密码验证模态框 -->
-        <div id="passwordModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>🔐请输入访问密码</h2>
-                </div>
-                <form id="passwordForm" class="password-form">
-                    <div class="form-group">
-                        <input type="password" id="password" required placeholder="请输入访问密码">
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="submit-btn">确认</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- 出式添加提醒表单 -->
+
+        <!-- ��出式添加提醒表单 -->
         <div id="addFormModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -74,9 +59,7 @@
                             <button type="button" class="time-shortcut-btn" onclick="setDaysLater(29)">29天后</button>
                             <button type="button" class="time-shortcut-btn" onclick="setDaysLater(364)">364天后</button>
                         </div>
-                        <input type="datetime-local" 
-                               id="remindTime" 
-                               required>
+                        <input type="datetime-local" id="remindTime" required>
                     </div>
                     <div class="form-group">
                         <label for="cycleType">🔁循环类型:</label>
@@ -119,7 +102,8 @@
     <div id="toast" class="toast">
         <div class="toast-content">
             <svg class="toast-icon success" viewBox="0 0 1024 1024" width="16" height="16">
-                <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm193.5 301.7l-210.6 292a31.8 31.8 0 0 1-51.7 0L318.5 484.9c-3.8-5.3 0-12.7 6.5-12.7h46.9c10.2 0 19.9 4.9 25.9 13.3l71.2 98.8 157.2-218c6-8.3 15.6-13.3 25.9-13.3H699c6.5 0 10.3 7.4 6.5 12.7z"/>
+                <path
+                    d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm193.5 301.7l-210.6 292a31.8 31.8 0 0 1-51.7 0L318.5 484.9c-3.8-5.3 0-12.7 6.5-12.7h46.9c10.2 0 19.9 4.9 25.9 13.3l71.2 98.8 157.2-218c6-8.3 15.6-13.3 25.9-13.3H699c6.5 0 10.3 7.4 6.5 12.7z" />
             </svg>
             <span id="toastMessage"></span>
         </div>
@@ -128,85 +112,51 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
     <script>
-        let authToken = '';
-        const passwordModal = document.getElementById('passwordModal');
-        const STORAGE_KEY = 'deadline_auth';
-        const EXPIRE_DAYS = 30;
-        
-        // 检查存储的密码是否有效
-        function checkStoredPassword() {
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    const { password, expireTime } = JSON.parse(stored);
-                    if (new Date().getTime() < expireTime) {
-                        return password;
-                    } else {
-                        localStorage.removeItem(STORAGE_KEY);
-                    }
-                } catch (error) {
-                    localStorage.removeItem(STORAGE_KEY);
-                }
-            }
-            return null;
+        // 快速时间设置函数
+        function setQuickTime(minutes) {
+            const now = new Date();
+            const futureTime = new Date(now.getTime() + minutes * 60000);
+            // 格式化日期时间为datetime-local格式
+            const formattedDateTime = formatDateTimeForInput(futureTime);
+            document.getElementById('remindTime').value = formattedDateTime;
         }
 
-        // 保存密码到本地存储
-        function savePassword(password) {
-            const expireTime = new Date().getTime() + (EXPIRE_DAYS * 24 * 60 * 60 * 1000);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                password,
-                expireTime
-            }));
-        }
-        
-        // 显示密码输入框
-        function showPasswordModal() {
-            const storedPassword = checkStoredPassword();
-            if (storedPassword) {
-                verifyPassword(storedPassword);
-            } else {
-                passwordModal.style.display = "block";
-            }
+        function setTomorrowMorning() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(9, 0, 0, 0);
+            document.getElementById('remindTime').value = formatDateTimeForInput(tomorrow);
         }
 
-        // 验证密码
-        async function verifyPassword(password) {
-            try {
-                const response = await fetch(`${API_BASE}`, {
-                    headers: {
-                        'Authorization': `Bearer ${password}`
-                    }
-                });
-                
-                if (response.ok) {
-                    authToken = password;
-                    passwordModal.style.display = "none";
-                    savePassword(password);  // 保存有效的密码
-                    loadReminders();
-                    return true;
-                } else {
-                    showToast('密码错误，请重试', 'error');
-                    localStorage.removeItem(STORAGE_KEY);  // 移除无效的密码
-                    return false;
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                showToast('验证密码时出错', 'error');
-                return false;
-            }
+        function setTomorrowNoon() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(12, 0, 0, 0);
+            document.getElementById('remindTime').value = formatDateTimeForInput(tomorrow);
         }
 
-        // 处理密码表单提交
-        document.getElementById('passwordForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const password = document.getElementById('password').value;
-            await verifyPassword(password);
-        });
+        function setDaysLater(days) {
+            const now = new Date();
+            const futureTime = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+            // 保持当前时间
+            futureTime.setHours(now.getHours());
+            futureTime.setMinutes(now.getMinutes());
+            document.getElementById('remindTime').value = formatDateTimeForInput(futureTime);
+        }
+
+        // 格式化日期时间为datetime-local输入框格式
+        function formatDateTimeForInput(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
+        }
 
         // 使用相对路径，自动适应当前域名
         const API_BASE = '/api/reminders';
-        
+
         // 格式化时间
         function formatDateTime(date) {
             const d = new Date(date);
@@ -223,7 +173,7 @@
 
         // 自定义确认窗口
         let confirmResolve = null;
-        
+
         function showConfirm(message) {
             return new Promise((resolve) => {
                 const modal = document.getElementById('confirmModal');
@@ -248,11 +198,11 @@
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toastMessage');
             const icon = toast.querySelector('.toast-icon');
-            
+
             toastMessage.textContent = message;
             toast.className = `toast show ${type}`;
             icon.className = `toast-icon ${type}`;
-            
+
             // 3秒后自动消失
             setTimeout(() => {
                 toast.className = 'toast';
@@ -271,7 +221,6 @@
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify({ cronJobId })
                 });
@@ -292,7 +241,7 @@
         // 添加提醒
         async function addReminder(event) {
             event.preventDefault();
-            
+
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
             const remindTime = document.getElementById('remindTime').value;
@@ -314,7 +263,6 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify(reminder)
                 });
@@ -339,12 +287,12 @@
         function calculateNextRemindTime(currentTime, cycleType) {
             const date = new Date(currentTime);
             const timestamp = date.getTime();
-            
+
             // 计算各个周期的毫秒
             const DAY_MS = 24 * 60 * 60 * 1000;
             const WEEK_MS = 7 * DAY_MS;
-            
-            switch(cycleType) {
+
+            switch (cycleType) {
                 case 'weekly':
                     return new Date(timestamp + WEEK_MS);
                 case 'monthly': {
@@ -355,15 +303,15 @@
                     const hour = date.getHours();
                     const minute = date.getMinutes();
                     const second = date.getSeconds();
-                    
+
                     // 创建下个月的同一天
                     let nextDate = new Date(year, month + 1, day, hour, minute, second);
-                    
+
                     // 如果结果是无效日期（比如 1月31日 -> 2月31日），回退到月底
                     if (nextDate.getMonth() !== (month + 1) % 12) {
                         nextDate = new Date(year, month + 2, 0, hour, minute, second); // 设置为下个月的最后一天
                     }
-                    
+
                     return nextDate;
                 }
                 case 'yearly': {
@@ -373,15 +321,15 @@
                     const hour = date.getHours();
                     const minute = date.getMinutes();
                     const second = date.getSeconds();
-                    
+
                     // 创建明年的同一天
                     let nextDate = new Date(year + 1, month, day, hour, minute, second);
-                    
+
                     // 处理2月29日的特殊情况
                     if (month === 1 && day === 29 && !isLeapYear(year + 1)) {
                         nextDate = new Date(year + 1, 1, 28, hour, minute, second);
                     }
-                    
+
                     return nextDate;
                 }
                 default:
@@ -397,17 +345,13 @@
         // 加载提醒列表
         async function loadReminders() {
             try {
-                const response = await fetch(API_BASE, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
+                const response = await fetch(API_BASE);
                 if (!response.ok) {
                     const error = await response.text();
                     throw new Error(error || '加载失败');
                 }
                 const reminders = await response.json();
-                
+
                 const listElement = document.getElementById('remindersList');
                 listElement.innerHTML = '';
 
@@ -534,11 +478,11 @@
         const openBtn = document.getElementById('openAddForm');
         const closeBtn = document.getElementsByClassName('close')[0];
 
-        openBtn.onclick = function() {
+        openBtn.onclick = function () {
             modal.style.display = "block";
         }
 
-        closeBtn.onclick = function() {
+        closeBtn.onclick = function () {
             closeModal();
         }
 
@@ -547,7 +491,7 @@
             document.getElementById('reminderForm').reset();
         }
 
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == modal) {
                 closeModal();
             }
@@ -555,67 +499,16 @@
 
         // 事件监听
         document.getElementById('reminderForm').addEventListener('submit', addReminder);
-        
+
+        // 初始加载
+        loadReminders();
+
         // 设置datetime-local的最小值为当前时间
         const remindTimeInput = document.getElementById('remindTime');
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         remindTimeInput.min = now.toISOString().slice(0, 16);
-
-        // 页面加载时检查密码
-        window.onload = function() {
-            const storedPassword = checkStoredPassword();
-            if (storedPassword) {
-                verifyPassword(storedPassword);
-            } else {
-                showPasswordModal();
-            }
-        }
-
-        // 快速时间设置函数
-        function setQuickTime(minutes) {
-            const now = new Date();
-            const futureTime = new Date(now.getTime() + minutes * 60000);
-            // 格式化日期时间为datetime-local格式
-            const formattedDateTime = formatDateTimeForInput(futureTime);
-            document.getElementById('remindTime').value = formattedDateTime;
-        }
-
-        // 格式化日期时间为datetime-local输入框格式
-        function formatDateTimeForInput(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
-
-        function setTomorrowMorning() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(9, 0, 0, 0);
-            document.getElementById('remindTime').value = formatDateTimeForInput(tomorrow);
-        }
-
-        function setTomorrowNoon() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(12, 0, 0, 0);
-            document.getElementById('remindTime').value = formatDateTimeForInput(tomorrow);
-        }
-
-        function setDaysLater(days) {
-            const now = new Date();
-            const futureTime = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-            // 保持当前时间
-            futureTime.setHours(now.getHours());
-            futureTime.setMinutes(now.getMinutes());
-            document.getElementById('remindTime').value = formatDateTimeForInput(futureTime);
-        }
-
-        // 移除初始的loadReminders调用
-        // loadReminders();
     </script>
 </body>
-</html> 
+
+</html>
