@@ -93,7 +93,7 @@ export async function onRequest(context) {
                     minutes: [scheduleDate.getMinutes()],
                     mdays: [scheduleDate.getDate()],
                     months: [scheduleDate.getMonth() + 1],
-                    wdays: [dayOfWeek === 0 ? 7 : dayOfWeek],  // 将周日的0转换为7
+                    wdays: [dayOfWeek === 0 ? 7 : dayOfWeek],  // 将日的0转换为7
                     expiresAt: parseInt(expiresAt)  // 转换为整数
                 };
                 jobConfig.enabled = true;
@@ -118,7 +118,7 @@ export async function onRequest(context) {
                     minutes: [scheduleDate.getMinutes()],
                     mdays: [scheduleDate.getDate()],
                     months: [scheduleDate.getMonth() + 1],
-                    wdays: [1, 2, 3, 4, 5, 6, 7]  // 允许任何星期
+                    wdays: [0, 1, 2, 3, 4, 5, 6]  // 修改为包含0(周日)而不是7
                 };
             } else {
                 // 每月循环：只设置固定的日期
@@ -128,7 +128,7 @@ export async function onRequest(context) {
                     minutes: [scheduleDate.getMinutes()],
                     mdays: [scheduleDate.getDate()],
                     months: Array.from({length: 12}, (_, i) => i + 1),  // 所有月份
-                    wdays: [1, 2, 3, 4, 5, 6, 7]  // 允许任何星期
+                    wdays: [0, 1, 2, 3, 4, 5, 6]  // 修改为包含0(周日)而不是7
                 };
             }
 
