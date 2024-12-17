@@ -48,9 +48,13 @@
                             <button type="button" class="time-shortcut-btn" onclick="setQuickTime(120)">2小时后</button>
                             <button type="button" class="time-shortcut-btn" onclick="setTomorrowMorning()">明早9点</button>
                             <button type="button" class="time-shortcut-btn" onclick="setTomorrowNoon()">明天中午12点</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setDaysLater(6)">6天后</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setDaysLater(29)">29天后</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setDaysLater(364)">364天后</button>
                         </div>
                         <input type="datetime-local" 
                                id="remindTime" 
+                               placeholder="yyyy-mm-dd hh:mm"
                                required>
                     </div>
                     <div class="form-group">
@@ -124,6 +128,15 @@
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(12, 0, 0, 0);
             document.getElementById('remindTime').value = formatDateTimeForInput(tomorrow);
+        }
+
+        function setDaysLater(days) {
+            const now = new Date();
+            const futureTime = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+            // 保持当前时间
+            futureTime.setHours(now.getHours());
+            futureTime.setMinutes(now.getMinutes());
+            document.getElementById('remindTime').value = formatDateTimeForInput(futureTime);
         }
 
         // 格式化日期时间为datetime-local输入框格式
@@ -208,7 +221,7 @@
                 });
 
                 if (response.ok) {
-                    showToast('���醒删除成功！');
+                    showToast('提醒删除成功！');
                     loadReminders();
                 } else {
                     const error = await response.text();
@@ -409,7 +422,7 @@
                                         <path d="M685.4 354.8c0-4.4-3.6-8-8-8l-66 .3L512 465.6l-99.3-118.4-66.1-.3c-4.4 0-8 3.5-8 8 0 1.9.7 3.7 1.9 5.2l130.1 155L340.5 670a8.32 8.32 0 0 0-1.9 5.2c0 4.4 3.6 8 8 8l66.1-.3L512 564.4l99.3 118.4 66 .3c4.4 0 8-3.5 8-8 0-1.9-.7-3.7-1.9-5.2L553.5 515l130.1-155c1.2-1.4 1.8-3.3 1.8-5.2z"/>
                                         <path d="M512 65C264.6 65 64 265.6 64 513s200.6 448 448 448 448-200.6 448-448S759.4 65 512 65zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
                                     </svg>
-                                    单次��醒无下次提醒
+                                    单次提醒无下次提醒
                                 </p>
                                 ` : `
                                 <p class="time-text next-remind waiting">

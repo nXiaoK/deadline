@@ -191,12 +191,14 @@ input[type="datetime-local"]:focus {
 
 /* 占位符文本样式 */
 input::placeholder,
-textarea::placeholder {
+textarea::placeholder,
+input[type="datetime-local"]::placeholder {
     color: #bfbfbf;
 }
 
 input:hover::placeholder,
-textarea:hover::placeholder {
+textarea:hover::placeholder,
+input[type="datetime-local"]:hover::placeholder {
     color: #8c8c8c;
 }
 
