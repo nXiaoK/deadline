@@ -83,6 +83,8 @@ h1 {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     backdrop-filter: blur(4px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .modal-content {
@@ -526,11 +528,37 @@ textarea {
     
     .modal-content {
         width: 95%;
-        margin: 20px auto;
+        margin: 10px auto;
+        margin-bottom: 20px;
     }
     
     form {
         grid-template-columns: 1fr;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .form-actions {
+        margin-top: 16px;
+        padding-top: 12px;
+    }
+
+    .modal-header {
+        padding: 16px;
+    }
+
+    textarea {
+        height: 80px;
+    }
+
+    .time-shortcuts {
+        gap: 6px;
+        margin-bottom: 12px;
+    }
+
+    .time-shortcut-btn {
+        padding: 4px 8px;
+        font-size: 11px;
     }
 } 
 
