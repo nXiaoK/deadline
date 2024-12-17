@@ -214,7 +214,7 @@ textarea {
     background-color: #ffffff;
     border-radius: 8px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease 0.1s;
     border-top: 8px solid #e8e8e8;
     position: relative;
     z-index: 1;
@@ -230,7 +230,7 @@ textarea {
     border: 2px dashed #e8e8e8;
     border-radius: 8px;
     opacity: 0;
-    transition: all 0s ease;
+    transition: all 0.1s ease;
     z-index: -1;
 }
 
