@@ -17,8 +17,10 @@
     <!-- 在body开始处添加密码验证层 -->
     <div id="password-overlay" class="password-overlay">
         <div class="password-container">
-            <input type="password" id="password-input" placeholder="请输入密码">
-            <button onclick="verifyPassword()">确认</button>
+            <form id="password-form" onsubmit="verifyPassword(event)">
+                <input type="password" id="password-input" placeholder="请输入密码">
+                <button type="submit">确认</button>
+            </form>
         </div>
     </div>
     <div class="container">
@@ -517,7 +519,8 @@
         remindTimeInput.min = now.toISOString().slice(0, 16);
 
         // 添加密码验证相关函数
-        async function verifyPassword() {
+        async function verifyPassword(event) {
+            event.preventDefault(); // 阻止表单默认提交
             const password = document.getElementById('password-input').value;
             try {
                 const response = await fetch('/api/verify-password', {
