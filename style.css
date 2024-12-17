@@ -191,14 +191,12 @@ input[type="datetime-local"]:focus {
 
 /* 占位符文本样式 */
 input::placeholder,
-textarea::placeholder,
-input[type="datetime-local"]::placeholder {
+textarea::placeholder {
     color: #bfbfbf;
 }
 
 input:hover::placeholder,
-textarea:hover::placeholder,
-input[type="datetime-local"]:hover::placeholder {
+textarea:hover::placeholder {
     color: #8c8c8c;
 }
 
@@ -367,7 +365,7 @@ textarea {
 
 .card-header {
     padding: 16px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #333333;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -375,9 +373,9 @@ textarea {
 
 .card-header h3 {
     margin: 0;
-    color: #1a1a1a;
-    font-size: 16px;
-    font-weight: 500;
+    color: #000000;
+    font-size: 32px;
+    font-weight: 5000;
 }
 
 .card-content {
@@ -385,8 +383,8 @@ textarea {
 }
 
 .content-text {
-    color: #666;
-    font-size: 14px;
+    color: #000000;
+    font-size: 24px;
     margin-bottom: 12px;
 }
 
@@ -448,7 +446,7 @@ textarea {
 
 .card-actions {
     padding: 12px 16px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid #333333;
     display: flex;
     justify-content: flex-end;
 }
