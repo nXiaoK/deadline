@@ -32,8 +32,8 @@ body {
 
 .logo-link {
     display: block;
-    width: 32px;
-    height: 32px;
+    width: 64px;
+    height: 64px;
     transition: transform 0.6s ease;
 }
 
@@ -50,7 +50,7 @@ body {
 h1 {
     color: #1a1a1a;
     margin: 0;
-    font-size: 24px;
+    font-size: 48px;
 }
 
 .add-button {
@@ -68,7 +68,7 @@ h1 {
 }
 
 .add-button:hover {
-    background-color: #40a9ff;
+    background-color: #4640ff;
     transform: translateY(-1px);
 }
 
