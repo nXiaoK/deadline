@@ -7,6 +7,8 @@
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="shortcut icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -39,10 +41,11 @@
                     </div>
                     <div class="form-group">
                         <label for="remindTime">提醒时间:</label>
-                        <input type="datetime-local" 
+                        <input type="text" 
                                id="remindTime" 
                                required 
-                               placeholder="选择日期和时间">
+                               placeholder="选择日期和时间"
+                               data-input>
                     </div>
                     <div class="form-group">
                         <label for="cycleType">循环类型:</label>
@@ -91,7 +94,36 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
     <script>
+        // 初始化 Flatpickr
+        const fp = flatpickr("#remindTime", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i",
+            time_24hr: true,
+            locale: "zh",
+            minuteIncrement: 1,
+            defaultHour: new Date().getHours(),
+            defaultMinute: new Date().getMinutes(),
+            minDate: "today",
+            disableMobile: false,  // 移动设备上也使用 Flatpickr
+            position: "auto",
+            theme: "material_blue",
+            animate: true,
+            plugins: [
+                {
+                    onOpen: function() {
+                        // 添加动画效果
+                        document.querySelector(".flatpickr-calendar").style.transform = "scale(0.95)";
+                        setTimeout(() => {
+                            document.querySelector(".flatpickr-calendar").style.transform = "scale(1)";
+                        }, 50);
+                    }
+                }
+            ]
+        });
+
         // 使用相对路径，自动适应当前域名
         const API_BASE = '/api/reminders';
         
@@ -211,7 +243,7 @@
                     closeModal();
                     loadReminders();
                 } else {
-                    throw new Error(responseText || '添加��败');
+                    throw new Error(responseText || '添加失败');
                 }
             } catch (error) {
                 console.error('Error:', error);
