@@ -304,7 +304,7 @@ textarea {
 }
 
 .theme-weekly .dashed-border {
-    border-color: #52c41a;
+    border-color: #fa8c16;
 }
 
 .theme-monthly .dashed-border {
@@ -312,7 +312,7 @@ textarea {
 }
 
 .theme-yearly .dashed-border {
-    border-color: #fa8c16;
+    border-color: #52c41a;
 }
 
 /* 提醒卡片样式 */
@@ -333,7 +333,7 @@ textarea {
 }
 
 .theme-weekly .reminder-card {
-    border-color: #3da919;
+    border-color: #fa8c16d3;
 }
 
 .theme-monthly .reminder-card {
@@ -341,7 +341,7 @@ textarea {
 }
 
 .theme-yearly .reminder-card {
-    border-color: #fa8c16d3;
+    border-color: #3da919;
 }
 
 .reminder-card:hover {
