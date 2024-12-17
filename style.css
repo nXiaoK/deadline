@@ -329,11 +329,11 @@ textarea {
 
 /* 不同类型的卡片主题色 */
 .theme-once .reminder-card {
-    border-color: #1890ff;
+    border-color: #188bff;
 }
 
 .theme-weekly .reminder-card {
-    border-color: #52c41a;
+    border-color: #3da919;
 }
 
 .theme-monthly .reminder-card {
@@ -341,7 +341,7 @@ textarea {
 }
 
 .theme-yearly .reminder-card {
-    border-color: #fa8c16;
+    border-color: #fa8c16d3;
 }
 
 .reminder-card:hover {
