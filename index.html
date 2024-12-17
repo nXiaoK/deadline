@@ -23,7 +23,24 @@
             <button id="openAddForm" class="add-button">📑添加新提醒</button>
         </div>
         
-        <!-- ��出式添加提醒表单 -->
+        <!-- 密码验证模态框 -->
+        <div id="passwordModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🔐请输入访问密码</h2>
+                </div>
+                <form id="passwordForm" class="password-form">
+                    <div class="form-group">
+                        <input type="password" id="password" required placeholder="请输入访问密码">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">确认</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- 出式添加提醒表单 -->
         <div id="addFormModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -111,47 +128,45 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
     <script>
-        // 快速时间设置函数
-        function setQuickTime(minutes) {
-            const now = new Date();
-            const futureTime = new Date(now.getTime() + minutes * 60000);
-            // 格式化日期时间为datetime-local格式
-            const formattedDateTime = formatDateTimeForInput(futureTime);
-            document.getElementById('remindTime').value = formattedDateTime;
+        let authToken = '';
+        const passwordModal = document.getElementById('passwordModal');
+        
+        // 显示密码输入框
+        function showPasswordModal() {
+            passwordModal.style.display = "block";
         }
 
-        function setTomorrowMorning() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(9, 0, 0, 0);
-            document.getElementById('remindTime').value = formatDateTimeForInput(tomorrow);
+        // 验证密码
+        async function verifyPassword(password) {
+            try {
+                const response = await fetch(`${API_BASE}`, {
+                    headers: {
+                        'Authorization': `Bearer ${password}`
+                    }
+                });
+                
+                if (response.ok) {
+                    authToken = password;
+                    passwordModal.style.display = "none";
+                    loadReminders();
+                    return true;
+                } else {
+                    showToast('密码错误，请重试', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('验证密码时出错', 'error');
+                return false;
+            }
         }
 
-        function setTomorrowNoon() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(12, 0, 0, 0);
-            document.getElementById('remindTime').value = formatDateTimeForInput(tomorrow);
-        }
-
-        function setDaysLater(days) {
-            const now = new Date();
-            const futureTime = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
-            // 保持当前时间
-            futureTime.setHours(now.getHours());
-            futureTime.setMinutes(now.getMinutes());
-            document.getElementById('remindTime').value = formatDateTimeForInput(futureTime);
-        }
-
-        // 格式化日期时间为datetime-local输入框格式
-        function formatDateTimeForInput(date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            return `${year}-${month}-${day}T${hours}:${minutes}`;
-        }
+        // 处理密码表单提交
+        document.getElementById('passwordForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            await verifyPassword(password);
+        });
 
         // 使用相对路径，自动适应当前域名
         const API_BASE = '/api/reminders';
@@ -220,6 +235,7 @@
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify({ cronJobId })
                 });
@@ -262,6 +278,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
                     },
                     body: JSON.stringify(reminder)
                 });
@@ -344,7 +361,11 @@
         // 加载提醒列表
         async function loadReminders() {
             try {
-                const response = await fetch(API_BASE);
+                const response = await fetch(API_BASE, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
                 if (!response.ok) {
                     const error = await response.text();
                     throw new Error(error || '加载失败');
@@ -507,6 +528,11 @@
         const now = new Date();
         now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
         remindTimeInput.min = now.toISOString().slice(0, 16);
+
+        // 页面加载时显示密码输入框
+        window.onload = function() {
+            showPasswordModal();
+        }
     </script>
 </body>
 </html> 

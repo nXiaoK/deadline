@@ -737,4 +737,34 @@ textarea {
 
 .time-shortcut-btn:active {
     background-color: #e6f7ff;
+}
+
+.password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.password-form input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e8e8e8;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.password-form input[type="password"]:focus {
+    border-color: #0a76a1;
+    outline: none;
+}
+
+.password-form .form-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.password-form .submit-btn {
+    min-width: 120px;
 } 

@@ -105,6 +105,71 @@ export async function onRequest(context) {
             }
         }
 
+        // 发送到Bark
+        if (env.BARK_KEY) {
+            try {
+                const displayTime = new Date(new Date(reminder.remind_time).getTime());
+                const cycleText = {
+                    'once': '单次提醒',
+                    'weekly': '每周循环',
+                    'monthly': '每月循环',
+                    'yearly': '每年循环'
+                }[reminder.cycle_type] || '单次提醒';
+                
+                const barkServer = env.BARK_SERVER_URL || 'https://api.day.app';
+                const barkUrl = `${barkServer}/${env.BARK_KEY}/`;
+                
+                const barkResponse = await fetch(barkUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `🔔 提醒：${reminder.title}`,
+                        body: `${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}\n📅 循环类型：${cycleText}`,
+                        group: 'Reminder',
+                        icon: '🔔',
+                        sound: 'alarm'
+                    })
+                });
+
+                const barkResult = await barkResponse.json();
+                notificationResults.push({ platform: 'bark', success: barkResponse.ok, result: barkResult });
+
+                if (!barkResponse.ok) {
+                    console.error('Bark API error:', barkResult);
+                }
+            } catch (error) {
+                console.error('Error sending Bark message:', error);
+                notificationResults.push({ platform: 'bark', success: false, error: error.message });
+            }
+        }
+
+        // 发送到Bark
+        if (env.BARK_KEY) {
+            try {
+                const displayTime = new Date(new Date(reminder.remind_time).getTime());
+                const cycleText = {
+                    'once': '单次提醒',
+                    'weekly': '每周循环',
+                    'monthly': '每月循环',
+                    'yearly': '每年循环'
+                }[reminder.cycle_type] || '单次提醒';
+                const barkMessage = {
+                    title: `🔔 提醒：${reminder.title}`,
+                    body: `${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}\n\n📅 循环类型：${cycleText}`,
+                };
+                const barkURL = `https://api.day.app/${env.BARK_KEY}/${encodeURIComponent(barkMessage.title)}/${encodeURIComponent(barkMessage.body)}`;
+                const barkResponse = await fetch(barkURL);
+                const barkResult = await barkResponse.json();
+                notificationResults.push({ platform: 'bark', success: barkResponse.ok, result: barkResult });
+                if (!barkResponse.ok) {
+                    console.error('Bark API error:', barkResult);
+                }
+            } catch (error) {
+                console.error('Error sending Bark message:', error);
+                notificationResults.push({ platform: 'bark', success: false, error: error.message });
+            }
+        }
+
         // 更新提醒状态为已发送
         await env.DB.prepare(
             'UPDATE reminders SET status = 1 WHERE id = ?'
