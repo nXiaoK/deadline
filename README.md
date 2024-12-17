@@ -21,7 +21,7 @@
 
 ## 数据库设置
 
-1. 在 Cloudflare Workers 中创建 D1 数据库：
+1. 在 Cloudflare Workers and Pages 中创建 D1 数据库：
 
 ```sql
 -- 创建提醒表
