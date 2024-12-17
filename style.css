@@ -327,3 +327,73 @@ textarea {
         margin: 20px auto;
     }
 } 
+
+/* 确认和提示窗口样式 */
+.confirm-modal .modal-content,
+.alert-modal .modal-content {
+    max-width: 400px;
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-body {
+    padding: 24px;
+    text-align: center;
+    color: #1a1a1a;
+    font-size: 16px;
+}
+
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid #f0f0f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.confirm-btn {
+    background-color: #1890ff;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.confirm-btn:hover {
+    background-color: #40a9ff;
+    transform: translateY(-1px);
+}
+
+.confirm-modal .cancel-btn,
+.alert-modal .cancel-btn {
+    background-color: #f0f0f0;
+    color: #666;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.confirm-modal .cancel-btn:hover,
+.alert-modal .cancel-btn:hover {
+    background-color: #d9d9d9;
+    transform: translateY(-1px);
+} 
