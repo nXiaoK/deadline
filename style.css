@@ -294,7 +294,7 @@ textarea {
     right: 0;
     bottom: 0;
     border: 2px dashed #e8e8e8;
-    border-radius: 8px;
+    border-radius: 25px;
     pointer-events: none;
 }
 
@@ -322,7 +322,7 @@ textarea {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     border: 2px solid;
-    border-top-width: 8px;
+    border-top-width: 25px;
     position: relative;
     z-index: 1;
 }
