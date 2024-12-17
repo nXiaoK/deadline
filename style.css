@@ -217,6 +217,7 @@ textarea {
     transition: all 0.3s ease;
     border-top: 4px solid #e8e8e8;
     position: relative;
+    z-index: 1;
 }
 
 .reminder-card::after {
@@ -230,7 +231,7 @@ textarea {
     border-radius: 8px;
     opacity: 0;
     transition: all 0.3s ease;
-    pointer-events: none;
+    z-index: -1;
 }
 
 .reminder-card::before {
@@ -239,7 +240,14 @@ textarea {
     inset: 0;
     background-color: #ffffff;
     border-radius: 8px;
-    z-index: -1;
+    z-index: 0;
+}
+
+.card-header,
+.card-content,
+.card-actions {
+    position: relative;
+    z-index: 1;
 }
 
 /* 不同类型的卡片主题色 */
