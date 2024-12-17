@@ -32,20 +32,21 @@
                 </div>
                 <form id="reminderForm">
                     <div class="form-group">
-                        <label for="title">项目名称:</label>
+                        <label for="title">🪪项目名称:</label>
                         <input type="text" id="title" required>
                     </div>
                     <div class="form-group">
-                        <label for="link">链接地址:</label>
+                        <label for="link">📌链接地址:</label>
                         <input type="url" id="link" placeholder="可选，例如: https://example.com">
                     </div>
                     <div class="form-group full-width">
-                        <label for="content">项目内容:</label>
+                        <label for="content">🗊项目内容:</label>
                         <textarea id="content" required></textarea>
                     </div>
                     <div class="form-group full-width">
-                        <label for="remindTime">提醒时间:</label>
+                        <label for="remindTime">⏰提醒时间:</label>
                         <div class="time-shortcuts">
+                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(3)">3分钟后</button>
                             <button type="button" class="time-shortcut-btn" onclick="setQuickTime(15)">15分钟后</button>
                             <button type="button" class="time-shortcut-btn" onclick="setQuickTime(30)">30分钟后</button>
                             <button type="button" class="time-shortcut-btn" onclick="setQuickTime(60)">1小时后</button>
@@ -61,7 +62,7 @@
                                required>
                     </div>
                     <div class="form-group">
-                        <label for="cycleType">循环类型:</label>
+                        <label for="cycleType">🔁循环类型:</label>
                         <select id="cycleType" required>
                             <option value="once">单次提醒</option>
                             <option value="weekly">每周循环</option>
