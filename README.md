@@ -52,7 +52,7 @@ CREATE TABLE reminders (
 1. 在 Cloudflare Pages 中创建新项目
 2. 连接您的 Git 仓库（GitHub、GitLab 等）
 3. 在 Pages 项目设置中：
-   - 绑定 D1 数据库
+   - 绑定 D1 数据库，绑定时变量为DB
    - 配置环境变量（见环境变量配置部分）
 4. 部署完成后，Pages 会自动为您生成一个域名
 
@@ -120,6 +120,18 @@ Content-Type: application/json
 ```http
 GET /api/notify?key=YOUR_CRON_SECRET&id=REMINDER_ID
 ```
+
+## Cron-job.org 额度限制
+
+使用 cron-job.org 的免费计划有以下限制：
+
+- 最多创建 50 个定时任务
+- 最短执行间隔为 1 分钟
+- 每个任务的超时时间为 30 秒
+- 每月可执行 10,000 次
+- 每个任务最多可以设置 100 个不同的执行时间点
+
+如果您需要更多的任务数量或执行次数，可以考虑升级到付费计划。
 
 ## 安全说明
 
