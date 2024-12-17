@@ -65,6 +65,10 @@
                             <option value="yearly">每年循环</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="link">链接:</label>
+                        <input type="text" id="link">
+                    </div>
                     <div class="form-actions">
                         <button type="submit" class="submit-btn">添加提醒</button>
                         <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
@@ -240,6 +244,7 @@
             const content = document.getElementById('content').value;
             const remindTime = document.getElementById('remindTime').value;
             const cycleType = document.getElementById('cycleType').value;
+            const link = document.getElementById('link').value;
 
             const reminder = {
                 id: Date.now().toString(),
@@ -247,7 +252,8 @@
                 content,
                 remind_time: localToUTC(remindTime),
                 cycle_type: cycleType,
-                status: 0
+                status: 0,
+                link: link || null  // 如果没有填写链接，则为null
             };
 
             try {
