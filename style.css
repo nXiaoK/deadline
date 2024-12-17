@@ -234,6 +234,11 @@ textarea {
     margin-bottom: 8px;
 }
 
+.time-text.next-remind {
+    color: #1890ff;
+    font-weight: 500;
+}
+
 .icon {
     fill: currentColor;
 }
