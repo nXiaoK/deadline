@@ -82,6 +82,7 @@ h1 {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    backdrop-filter: blur(4px);
 }
 
 .modal-content {
@@ -91,44 +92,54 @@ h1 {
     padding: 0;
     width: 90%;
     max-width: 500px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    animation: modalSlideIn 0.3s ease;
+    overflow: hidden;
 }
 
 .modal-header {
-    padding: 16px 24px;
+    padding: 20px 24px;
     border-bottom: 1px solid #f0f0f0;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #fafafa;
 }
 
 .modal-header h2 {
     margin: 0;
     color: #1a1a1a;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 .close {
     color: #999;
-    font-size: 20px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
-    transition: color 0.3s;
+    transition: all 0.3s;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
 }
 
 .close:hover {
     color: #666;
+    background-color: #f0f0f0;
 }
 
 /* 表单样式 */
 form {
-    padding: 24px;
+    padding: 24px 32px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
 }
 
 label {
@@ -136,6 +147,7 @@ label {
     margin-bottom: 8px;
     color: #1a1a1a;
     font-size: 14px;
+    font-weight: 500;
 }
 
 input[type="text"],
@@ -143,11 +155,20 @@ input[type="datetime-local"],
 textarea,
 select {
     width: 100%;
-    padding: 8px 12px;
+    padding: 10px 16px;
     border: 1px solid #d9d9d9;
-    border-radius: 6px;
+    border-radius: 8px;
     font-size: 14px;
     transition: all 0.3s;
+    background-color: #fafafa;
+}
+
+input[type="text"]:hover,
+input[type="datetime-local"]:hover,
+textarea:hover,
+select:hover {
+    border-color: #40a9ff;
+    background-color: #fff;
 }
 
 input[type="text"]:focus,
@@ -155,50 +176,71 @@ input[type="datetime-local"]:focus,
 textarea:focus,
 select:focus {
     outline: none;
-    border-color: #40a9ff;
-    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+    border-color: #1890ff;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 textarea {
-    height: 100px;
+    height: 120px;
     resize: vertical;
+    line-height: 1.6;
 }
 
 .form-actions {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .submit-btn {
     background-color: #1890ff;
     color: white;
-    padding: 8px 16px;
+    padding: 10px 24px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
     transition: all 0.3s;
 }
 
 .submit-btn:hover {
     background-color: #40a9ff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.35);
 }
 
 .cancel-btn {
     background-color: #f0f0f0;
     color: #666;
-    padding: 8px 16px;
+    padding: 10px 24px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
     transition: all 0.3s;
 }
 
 .cancel-btn:hover {
-    background-color: #d9d9d9;
+    background-color: #e0e0e0;
+    color: #333;
+    transform: translateY(-1px);
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* 提醒卡片网格布局 */
