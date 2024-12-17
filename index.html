@@ -41,6 +41,14 @@
                     </div>
                     <div class="form-group">
                         <label for="remindTime">提醒时间:</label>
+                        <div class="time-shortcuts">
+                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(15)">15分钟后</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(30)">30分钟后</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(60)">1小时后</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setQuickTime(120)">2小时后</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setTomorrowMorning()">明早9点</button>
+                            <button type="button" class="time-shortcut-btn" onclick="setTomorrowNoon()">明天中午12点</button>
+                        </div>
                         <input type="text" 
                                id="remindTime" 
                                required 
@@ -107,12 +115,11 @@
             defaultHour: new Date().getHours(),
             defaultMinute: new Date().getMinutes(),
             minDate: "today",
-            disableMobile: false,  // 移动设备上也使用 Flatpickr
+            disableMobile: false,
             position: "auto",
             theme: "material_blue",
             animate: true,
             onOpen: function() {
-                // 添加动画效果
                 const calendar = document.querySelector(".flatpickr-calendar");
                 if (calendar) {
                     calendar.style.transform = "scale(0.95)";
@@ -122,6 +129,27 @@
                 }
             }
         });
+
+        // 快速时间设置函数
+        function setQuickTime(minutes) {
+            const now = new Date();
+            const futureTime = new Date(now.getTime() + minutes * 60000);
+            fp.setDate(futureTime);
+        }
+
+        function setTomorrowMorning() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(9, 0, 0, 0);
+            fp.setDate(tomorrow);
+        }
+
+        function setTomorrowNoon() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(12, 0, 0, 0);
+            fp.setDate(tomorrow);
+        }
 
         // 使用相对路径，自动适应当前域名
         const API_BASE = '/api/reminders';
@@ -371,7 +399,7 @@
                                     <h3>${reminder.title}</h3>
                                 </div>
                                 <span class="status ${reminder.status === 0 ? 'pending' : 'completed'}">
-                                    ${reminder.status === 0 ? '待提醒' : '已提醒'}
+                                    ${reminder.status === 0 ? '待提醒' : '��提醒'}
                                 </span>
                             </div>
                             <div class="card-content">
