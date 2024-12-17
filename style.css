@@ -660,117 +660,47 @@ textarea {
     fill: white;
 } 
 
-/* Flatpickr 日期选择器样式覆盖 */
-.flatpickr-calendar {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
-    border-radius: 12px !important;
-    border: none !important;
-    width: 320px !important;  /* 增加宽度 */
+/* Semi UI DatePicker 自定义样式 */
+.semi-datepicker {
+    width: 100% !important;
 }
 
-.flatpickr-months {
-    background-color: #1890ff !important;
-    color: white !important;
-    border-radius: 12px 12px 0 0 !important;
-    margin: 0 !important;
+.semi-datepicker-focused {
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1) !important;
+}
+
+.semi-calendar-header {
     padding: 16px !important;
 }
 
-.flatpickr-months .flatpickr-month {
-    color: white !important;
-}
-
-.flatpickr-current-month {
-    padding-top: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-}
-
-.flatpickr-current-month .flatpickr-monthDropdown-months {
-    background-color: transparent !important;
-    color: white !important;
-    font-weight: 500 !important;
-    padding: 4px 8px !important;
-    border-radius: 6px !important;
-}
-
-.flatpickr-current-month .flatpickr-monthDropdown-months:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.flatpickr-months .flatpickr-prev-month,
-.flatpickr-months .flatpickr-next-month {
-    color: white !important;
-    fill: white !important;
+.semi-calendar-grid {
     padding: 8px !important;
-    border-radius: 50% !important;
 }
 
-.flatpickr-months .flatpickr-prev-month:hover,
-.flatpickr-months .flatpickr-next-month:hover {
-    background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-.flatpickr-weekdays {
-    background-color: #fafafa !important;
-    padding: 8px 0 !important;
-}
-
-.flatpickr-weekday {
-    color: #666 !important;
-    font-weight: 500 !important;
-}
-
-.flatpickr-day {
-    margin: 2px !important;
-    height: 36px !important;
-    line-height: 36px !important;
+.semi-calendar-date {
     border-radius: 8px !important;
-    font-weight: 500 !important;
+    transition: all 0.3s !important;
 }
 
-.flatpickr-day.selected {
+.semi-calendar-date-selected {
     background-color: #1890ff !important;
-    border-color: #1890ff !important;
-    color: white !important;
 }
 
-.flatpickr-day:hover {
+.semi-calendar-date:hover:not(.semi-calendar-date-selected) {
     background-color: #f0f9ff !important;
-    border-color: transparent !important;
     color: #1890ff !important;
 }
 
-.flatpickr-time {
-    background-color: #fafafa !important;
-    border-radius: 0 0 12px 12px !important;
-    padding: 8px !important;
+.semi-timepicker-popover {
+    border-radius: 12px !important;
+    overflow: hidden !important;
 }
 
-.flatpickr-time input {
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #1a1a1a !important;
-    background-color: transparent !important;
+.semi-timepicker-content {
+    padding: 16px !important;
 }
 
-.flatpickr-time .flatpickr-am-pm {
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #666 !important;
-}
-
-.numInputWrapper:hover {
-    background-color: #f0f9ff !important;
-}
-
-.numInput:hover {
-    background-color: transparent !important;
-}
-
-/* 快速时间选择按钮 */
+/* 快速时间选择按钮样式优化 */
 .time-shortcuts {
     display: flex;
     gap: 8px;
@@ -779,18 +709,23 @@ textarea {
 }
 
 .time-shortcut-btn {
-    padding: 4px 12px;
+    padding: 6px 12px;
     border: 1px solid #d9d9d9;
     border-radius: 6px;
     background-color: white;
     color: #666;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     transition: all 0.3s;
+    line-height: 1.4;
 }
 
 .time-shortcut-btn:hover {
     border-color: #1890ff;
     color: #1890ff;
     background-color: #f0f9ff;
+}
+
+.time-shortcut-btn:active {
+    transform: translateY(1px);
 } 

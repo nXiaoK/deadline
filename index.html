@@ -7,8 +7,7 @@
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="shortcut icon" href="logo.png" type="image/png">
     <link rel="apple-touch-icon" href="logo.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <link rel="stylesheet" href="https://unpkg.com/@douyinfe/semi-ui@2.51.0/dist/css/semi.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -49,11 +48,7 @@
                             <button type="button" class="time-shortcut-btn" onclick="setTomorrowMorning()">明早9点</button>
                             <button type="button" class="time-shortcut-btn" onclick="setTomorrowNoon()">明天中午12点</button>
                         </div>
-                        <input type="text" 
-                               id="remindTime" 
-                               required 
-                               placeholder="选择日期和时间"
-                               data-input>
+                        <div id="datePicker"></div>
                     </div>
                     <div class="form-group">
                         <label for="cycleType">循环类型:</label>
@@ -102,53 +97,82 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@douyinfe/semi-ui@2.51.0/dist/semi.min.js"></script>
     <script>
-        // 初始化 Flatpickr
-        const fp = flatpickr("#remindTime", {
-            enableTime: true,
-            dateFormat: "Y-m-d H:i",
-            time_24hr: true,
-            locale: "zh",
-            minuteIncrement: 1,
-            defaultHour: new Date().getHours(),
-            defaultMinute: new Date().getMinutes(),
-            minDate: "today",
-            disableMobile: false,
-            position: "auto",
-            theme: "material_blue",
-            animate: true,
-            onOpen: function() {
-                const calendar = document.querySelector(".flatpickr-calendar");
-                if (calendar) {
-                    calendar.style.transform = "scale(0.95)";
-                    setTimeout(() => {
-                        calendar.style.transform = "scale(1)";
-                    }, 50);
+        // 初始化 Semi DatePicker
+        const { DatePicker } = Semi;
+        
+        function SemiDatePicker({ onChange }) {
+            return React.createElement(DatePicker, {
+                type: 'dateTime',
+                style: { width: '100%' },
+                timePickerOpts: {
+                    scrollItemProps: { mode: 'wheel', cycled: true }
+                },
+                onChange: onChange,
+                locale: 'zh-CN',
+                placeholder: '选择日期和时间',
+                format: 'yyyy-MM-dd HH:mm:ss'
+            });
+        }
+
+        // 渲染 DatePicker
+        const datePickerContainer = document.getElementById('datePicker');
+        const root = ReactDOM.createRoot(datePickerContainer);
+        root.render(React.createElement(SemiDatePicker, {
+            onChange: (date) => {
+                if (date) {
+                    const formattedDate = date.toISOString();
+                    window.selectedDateTime = formattedDate;
                 }
             }
-        });
+        }));
 
         // 快速时间设置函数
         function setQuickTime(minutes) {
             const now = new Date();
             const futureTime = new Date(now.getTime() + minutes * 60000);
-            fp.setDate(futureTime);
+            root.render(React.createElement(SemiDatePicker, {
+                value: futureTime,
+                onChange: (date) => {
+                    if (date) {
+                        const formattedDate = date.toISOString();
+                        window.selectedDateTime = formattedDate;
+                    }
+                }
+            }));
         }
 
         function setTomorrowMorning() {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(9, 0, 0, 0);
-            fp.setDate(tomorrow);
+            root.render(React.createElement(SemiDatePicker, {
+                value: tomorrow,
+                onChange: (date) => {
+                    if (date) {
+                        const formattedDate = date.toISOString();
+                        window.selectedDateTime = formattedDate;
+                    }
+                }
+            }));
         }
 
         function setTomorrowNoon() {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
             tomorrow.setHours(12, 0, 0, 0);
-            fp.setDate(tomorrow);
+            root.render(React.createElement(SemiDatePicker, {
+                value: tomorrow,
+                onChange: (date) => {
+                    if (date) {
+                        const formattedDate = date.toISOString();
+                        window.selectedDateTime = formattedDate;
+                    }
+                }
+            }));
         }
 
         // 使用相对路径，自动适应当前域名
@@ -223,7 +247,7 @@
                 });
 
                 if (response.ok) {
-                    showToast('提醒删除成功！');
+                    showToast('提醒删��成功！');
                     loadReminders();
                 } else {
                     const error = await response.text();
@@ -241,14 +265,18 @@
             
             const title = document.getElementById('title').value;
             const content = document.getElementById('content').value;
-            const remindTime = document.getElementById('remindTime').value;
             const cycleType = document.getElementById('cycleType').value;
+
+            if (!window.selectedDateTime) {
+                showToast('请选择提醒时间', 'error');
+                return;
+            }
 
             const reminder = {
                 id: Date.now().toString(),
                 title,
                 content,
-                remind_time: localToUTC(remindTime),
+                remind_time: window.selectedDateTime,
                 cycle_type: cycleType,
                 status: 0
             };
@@ -399,7 +427,7 @@
                                     <h3>${reminder.title}</h3>
                                 </div>
                                 <span class="status ${reminder.status === 0 ? 'pending' : 'completed'}">
-                                    ${reminder.status === 0 ? '待提醒' : '��提醒'}
+                                    ${reminder.status === 0 ? '待提醒' : '提醒'}
                                 </span>
                             </div>
                             <div class="card-content">
@@ -477,6 +505,15 @@
         function closeModal() {
             modal.style.display = "none";
             document.getElementById('reminderForm').reset();
+            window.selectedDateTime = null;
+            root.render(React.createElement(SemiDatePicker, {
+                onChange: (date) => {
+                    if (date) {
+                        const formattedDate = date.toISOString();
+                        window.selectedDateTime = formattedDate;
+                    }
+                }
+            }));
         }
 
         window.onclick = function(event) {
