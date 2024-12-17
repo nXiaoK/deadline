@@ -152,6 +152,7 @@ label {
 
 input[type="text"],
 input[type="datetime-local"],
+input[type="url"],
 textarea,
 select {
     width: 100%;
@@ -182,6 +183,7 @@ textarea:hover::placeholder {
 
 input[type="text"]:hover,
 input[type="datetime-local"]:hover,
+input[type="url"]:hover,
 textarea:hover,
 select:hover {
     border-color: #40a9ff;
@@ -190,6 +192,7 @@ select:hover {
 
 input[type="text"]:focus,
 input[type="datetime-local"]:focus,
+input[type="url"]:focus,
 textarea:focus,
 select:focus {
     outline: none;
@@ -285,7 +288,7 @@ textarea {
     pointer-events: none;
 }
 
-/* 不同类型的虚线边框色 */
+/* 不同类型的虚线边框���色 */
 .theme-once .dashed-border {
     border-color: #1890ff;
 }
@@ -663,31 +666,4 @@ textarea {
 
 .time-shortcut-btn:active {
     background-color: #e6f7ff;
-} 
-
-.card-info {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-}
-
-.link-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    color: #1890ff;
-    transition: all 0.3s ease;
-}
-
-.link-icon:hover {
-    background-color: #e6f7ff;
-    transform: scale(1.1);
-}
-
-.link-icon svg {
-    fill: currentColor;
 } 
