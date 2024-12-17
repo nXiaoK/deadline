@@ -93,8 +93,8 @@ export async function onRequest(context) {
                     minutes: [scheduleDate.getMinutes()],
                     mdays: [scheduleDate.getDate()],
                     months: [scheduleDate.getMonth() + 1],
-                    wdays: [dayOfWeek === 0 ? 7 : dayOfWeek],  // 将日的0转换为7
-                    expiresAt: parseInt(expiresAt)  // 转换为整数
+                    wdays: [dayOfWeek],  // 直接使用 getDay() 返回的值，0 表示周日
+                    expiresAt: parseInt(expiresAt)
                 };
                 jobConfig.enabled = true;
                 jobConfig.stopOnError = false;
@@ -106,7 +106,7 @@ export async function onRequest(context) {
                     timezone: 'Asia/Shanghai',
                     hours: [scheduleDate.getHours()],
                     minutes: [scheduleDate.getMinutes()],
-                    wdays: [dayOfWeek === 0 ? 7 : dayOfWeek],  // 将周日的0转换为7
+                    wdays: [dayOfWeek],  // 直接使用 getDay() 返回的值，0 表示周日
                     mdays: Array.from({length: 31}, (_, i) => i + 1), // 1-31日
                     months: Array.from({length: 12}, (_, i) => i + 1)  // 1-12月
                 };
