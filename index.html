@@ -308,7 +308,7 @@
                     }
 
                     const reminderElement = document.createElement('div');
-                    reminderElement.className = 'reminder-card';
+                    reminderElement.className = `reminder-card theme-${reminder.cycle_type}`;
                     reminderElement.innerHTML = `
                         <div class="card-header">
                             <h3>${reminder.title}</h3>
