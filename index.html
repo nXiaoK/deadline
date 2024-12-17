@@ -530,6 +530,7 @@
                 
                 if (response.ok) {
                     document.getElementById('password-overlay').style.display = 'none';
+                    document.body.classList.remove('locked'); // 移除锁定
                     // 设置cookie，有效期30天
                     const expiryDate = new Date();
                     expiryDate.setDate(expiryDate.getDate() + 30);
@@ -559,9 +560,11 @@
                     const expiryDate = new Date();
                     expiryDate.setDate(expiryDate.getDate() + 30);
                     document.cookie = `auth=true; expires=${expiryDate.toUTCString()}; path=/`;
+                    document.body.classList.remove('locked'); // 移除锁定
                 } else if (!document.cookie.includes('auth=true')) {
                     // 如果需要密码且没有验证过，显示密码输入框
                     document.getElementById('password-overlay').style.display = 'flex';
+                    document.body.classList.add('locked'); // 添加锁定
                 }
             })
             .catch(error => {
