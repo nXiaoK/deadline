@@ -374,7 +374,7 @@ textarea {
 .card-header h3 {
     margin: 0;
     color: #000000;
-    font-size: 32px;
+    font-size: 20px;
     font-weight: 5000;
 }
 
@@ -384,7 +384,8 @@ textarea {
 
 .content-text {
     color: #000000;
-    font-size: 24px;
+    font-size: 16px;
+    font-weight: 3000;
     margin-bottom: 12px;
 }
 
