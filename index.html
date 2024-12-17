@@ -111,17 +111,16 @@
             position: "auto",
             theme: "material_blue",
             animate: true,
-            plugins: [
-                {
-                    onOpen: function() {
-                        // 添加动画效果
-                        document.querySelector(".flatpickr-calendar").style.transform = "scale(0.95)";
-                        setTimeout(() => {
-                            document.querySelector(".flatpickr-calendar").style.transform = "scale(1)";
-                        }, 50);
-                    }
+            onOpen: function() {
+                // 添加动画效果
+                const calendar = document.querySelector(".flatpickr-calendar");
+                if (calendar) {
+                    calendar.style.transform = "scale(0.95)";
+                    setTimeout(() => {
+                        calendar.style.transform = "scale(1)";
+                    }, 50);
                 }
-            ]
+            }
         });
 
         // 使用相对路径，自动适应当前域名
