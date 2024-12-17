@@ -8,42 +8,50 @@
 </head>
 <body>
     <div class="container">
-        <h1>提醒事项管理</h1>
+        <div class="header">
+            <h1>提醒事项管理</h1>
+            <button id="openAddForm" class="add-button">添加新提醒</button>
+        </div>
         
-        <!-- 添加提醒表单 -->
-        <div class="add-form">
-            <h2>添加新提醒</h2>
-            <form id="reminderForm">
-                <div class="form-group">
-                    <label for="title">项目名称:</label>
-                    <input type="text" id="title" required>
+        <!-- 弹出式添加提醒表单 -->
+        <div id="addFormModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>添加新提醒</h2>
+                    <span class="close">&times;</span>
                 </div>
-                <div class="form-group">
-                    <label for="content">项目内容:</label>
-                    <textarea id="content" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="remindTime">提醒时间:</label>
-                    <input type="datetime-local" id="remindTime" required>
-                </div>
-                <div class="form-group">
-                    <label for="cycleType">循环类型:</label>
-                    <select id="cycleType" required>
-                        <option value="once">单次提醒</option>
-                        <option value="weekly">每周循环</option>
-                        <option value="monthly">每月循环</option>
-                        <option value="yearly">每年循环</option>
-                    </select>
-                </div>
-                <button type="submit">添加提醒</button>
-            </form>
+                <form id="reminderForm">
+                    <div class="form-group">
+                        <label for="title">项目名称:</label>
+                        <input type="text" id="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="content">项目内容:</label>
+                        <textarea id="content" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="remindTime">提醒时间:</label>
+                        <input type="datetime-local" id="remindTime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cycleType">循环类型:</label>
+                        <select id="cycleType" required>
+                            <option value="once">单次提醒</option>
+                            <option value="weekly">每周循环</option>
+                            <option value="monthly">每月循环</option>
+                            <option value="yearly">每年循环</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="submit-btn">添加提醒</button>
+                        <button type="button" class="cancel-btn" onclick="closeModal()">取消</button>
+                    </div>
+                </form>
+            </div>
         </div>
 
         <!-- 提醒列表 -->
-        <div class="reminders-list">
-            <h2>提醒列表</h2>
-            <div id="remindersList"></div>
-        </div>
+        <div class="reminders-grid" id="remindersList"></div>
     </div>
 
     <script>
@@ -124,7 +132,7 @@
 
                 if (response.ok) {
                     alert('提醒添加成功！');
-                    document.getElementById('reminderForm').reset();
+                    closeModal();
                     loadReminders();
                 } else {
                     throw new Error(responseText || '添加失败');
@@ -159,22 +167,70 @@
                     }[reminder.cycle_type] || '单次提醒';
 
                     const reminderElement = document.createElement('div');
-                    reminderElement.className = 'reminder-item';
+                    reminderElement.className = 'reminder-card';
                     reminderElement.innerHTML = `
-                        <div class="reminder-header">
+                        <div class="card-header">
                             <h3>${reminder.title}</h3>
-                            <button class="delete-btn" onclick="deleteReminder('${reminder.id}', '${reminder.cron_job_id}')">删除</button>
+                            <span class="status ${reminder.status === 0 ? 'pending' : 'completed'}">
+                                ${reminder.status === 0 ? '待提醒' : '已提醒'}
+                            </span>
                         </div>
-                        <p>${reminder.content}</p>
-                        <p>提醒时间: ${formatDateTime(reminder.remind_time)}</p>
-                        <p>循环类型: ${cycleText}</p>
-                        <p class="status">${reminder.status === 0 ? '待提醒' : '已提醒'}</p>
+                        <div class="card-content">
+                            <p class="content-text">${reminder.content}</p>
+                            <p class="time-text">
+                                <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
+                                    <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
+                                    <path d="M686.7 638.6L544.1 535.5V288c0-4.4-3.6-8-8-8H488c-4.4 0-8 3.6-8 8v275.4c0 2.6 1.2 5 3.3 6.5l165.4 120.6c3.6 2.6 8.6 1.8 11.2-1.7l28.6-39c2.6-3.7 1.8-8.7-1.8-11.2z"/>
+                                </svg>
+                                ${formatDateTime(reminder.remind_time)}
+                            </p>
+                            <p class="cycle-text">
+                                <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
+                                    <path d="M512 64C264.6 64 64 264.6 64 512s200.6 448 448 448 448-200.6 448-448S759.4 64 512 64zm0 820c-205.4 0-372-166.6-372-372s166.6-372 372-372 372 166.6 372 372-166.6 372-372 372z"/>
+                                    <path d="M686.7 638.6L544.1 535.5V288c0-4.4-3.6-8-8-8H488c-4.4 0-8 3.6-8 8v275.4c0 2.6 1.2 5 3.3 6.5l165.4 120.6c3.6 2.6 8.6 1.8 11.2-1.7l28.6-39c2.6-3.7 1.8-8.7-1.8-11.2z"/>
+                                </svg>
+                                ${cycleText}
+                            </p>
+                        </div>
+                        <div class="card-actions">
+                            <button class="delete-btn" onclick="deleteReminder('${reminder.id}', '${reminder.cron_job_id}')">
+                                <svg class="icon" viewBox="0 0 1024 1024" width="16" height="16">
+                                    <path d="M360 184h-8c4.4 0 8-3.6 8-8v8h304v-8c0 4.4 3.6 8 8 8h-8v72h72v-80c0-35.3-28.7-64-64-64H352c-35.3 0-64 28.7-64 64v80h72v-72z"/>
+                                    <path d="M864 256H160c-17.7 0-32 14.3-32 32v32c0 4.4 3.6 8 8 8h60.4l24.7 523c1.6 34.1 29.8 61 63.9 61h454c34.2 0 62.3-26.8 63.9-61l24.7-523H888c4.4 0 8-3.6 8-8v-32c0-17.7-14.3-32-32-32zM731.3 840H292.7l-24.2-512h487l-24.2 512z"/>
+                                </svg>
+                                删除
+                            </button>
+                        </div>
                     `;
                     listElement.appendChild(reminderElement);
                 });
             } catch (error) {
                 console.error('Error:', error);
                 alert('加载提醒列表失败：' + error.message);
+            }
+        }
+
+        // 添加模态窗口相关的代码
+        const modal = document.getElementById('addFormModal');
+        const openBtn = document.getElementById('openAddForm');
+        const closeBtn = document.getElementsByClassName('close')[0];
+
+        openBtn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        closeBtn.onclick = function() {
+            closeModal();
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            document.getElementById('reminderForm').reset();
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
             }
         }
 
