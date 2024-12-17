@@ -740,14 +740,16 @@ textarea {
     background-color: #e6f7ff;
 }
 
-/* 添加密码验证层样式 */
+/* 修改密码验证层样式 */
 .password-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.5);  /* 改为半透明 */
+    backdrop-filter: blur(10px);  /* 添加毛玻璃效果 */
+    -webkit-backdrop-filter: blur(10px);  /* Safari 支持 */
     display: none;
     justify-content: center;
     align-items: center;
@@ -755,28 +757,61 @@ textarea {
 }
 
 .password-container {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.8);  /* 半透明背景 */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    animation: fadeIn 0.3s ease;
 }
 
 .password-container input {
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 12px;
+    margin-right: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    font-size: 16px;
+    width: 200px;
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .password-container button {
-    padding: 8px 16px;
+    padding: 12px 24px;
     background: #007bff;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
 }
 
 .password-container button:hover {
     background: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 添加兼容性处理 */
+@supports not (backdrop-filter: blur(10px)) {
+    .password-overlay {
+        background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .password-container {
+        background: white;
+    }
 }
