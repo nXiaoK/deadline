@@ -90,7 +90,7 @@
                             <option value="EUR">EUR (欧元)</option>
                         </select>
                     </div>
-                    <div class="form-group  full-width">
+                    <div class="form-group full-width">
                         <label for="amount">💰金额:</label>
                         <input type="number" id="amount" placeholder="请输入金额" step="0.01">
                     </div>
@@ -177,6 +177,30 @@
             const minutes = String(date.getMinutes()).padStart(2, '0');
             return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
+        //  将金额转为RMB的汇率转换函数
+        function convertToRMB(amount, currency) {
+            const rates = { USD: 7.3, EUR: 7.8, CNY: 1 }; // 示例汇率，可根据需要动态获取
+            return amount * (rates[currency] || 1);
+        }
+
+        function calculateTotalExpenses(reminders) {
+            let totalMonthly = 0;
+            let totalYearly = 0;
+
+            reminders.forEach(reminder => {
+                const amountInRMB = convertToRMB(reminder.amount, reminder.currency);
+                if (reminder.cycle_type === 'monthly') {
+                    totalMonthly += amountInRMB;
+                } else if (reminder.cycle_type === 'yearly') {
+                    totalYearly += amountInRMB;
+                }
+            });
+
+            totalYearly += totalMonthly * 12;
+
+            document.getElementById('totalMonthly').textContent = `总每月消费: ${totalMonthly.toFixed(2)} RMB`;
+            document.getElementById('totalYearly').textContent = `总每年消费: ${totalYearly.toFixed(2)} RMB`;
+        }
 
         // 使用相对路径，自动适应当前域名
         const API_BASE = '/api/reminders';
@@ -260,11 +284,6 @@
                 console.error('Error:', error);
                 showToast('删除提醒失败：' + error.message, 'error');
             }
-        }
-        //  将金额转为RMB的汇率转换函数
-        function convertToRMB(amount, currency) {
-            const rates = { USD: 7.3, EUR: 7.8, CNY: 1 }; // 示例汇率，可根据需要动态获取
-            return amount * (rates[currency] || 1);
         }
 
 
@@ -514,24 +533,6 @@
             }
         }
 
-        function calculateTotalExpenses(reminders) {
-            let totalMonthly = 0;
-            let totalYearly = 0;
-
-            reminders.forEach(reminder => {
-                const amountInRMB = convertToRMB(reminder.amount, reminder.currency);
-                if (reminder.cycle_type === 'monthly') {
-                    totalMonthly += amountInRMB;
-                } else if (reminder.cycle_type === 'yearly') {
-                    totalYearly += amountInRMB;
-                }
-            });
-
-            totalYearly += totalMonthly * 12;
-
-            document.getElementById('totalMonthly').textContent = `总每月消费: ${totalMonthly.toFixed(2)} RMB`;
-            document.getElementById('totalYearly').textContent = `总每年消费: ${totalYearly.toFixed(2)} RMB`;
-        }
 
 
         // 添加模态窗口相关的代码
