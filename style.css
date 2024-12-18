@@ -148,7 +148,7 @@ form {
 }
 
 .form-group.full-width {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1; /* 占满整个网格 */
 }
 
 label {
@@ -160,6 +160,7 @@ label {
 }
 
 input[type="text"],
+input[type="number"],
 input[type="datetime-local"],
 input[type="url"],
 textarea,
@@ -173,6 +174,12 @@ select {
     background-color: #fafafa;
     color: #1a1a1a;
 }
+
+input[type="number"]::placeholder {
+    color: #b3b3b3; /* 占位符颜色 */
+    font-size: 14px;
+}
+
 
 /* 日期时间输入框样式 */
 input[type="datetime-local"] {
