@@ -38,16 +38,23 @@ export async function onRequest(context) {
 
             // 插入数据
             await env.DB.prepare(
-                'INSERT INTO reminders (id, title, content, remind_time, cycle_type, status, link) VALUES (?, ?, ?, ?, ?, ?, ?)'
-            ).bind(
+                'INSERT INTO reminders (id, title, content, remind_time, cycle_type, status, link, amount, currency, monthly_amount, yearly_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            )
+            .bind(
                 reminder.id,
                 reminder.title,
                 reminder.content,
                 reminder.remind_time,
                 reminder.cycle_type,
-                0,
-                reminder.link
-            ).run();
+                0, // status 默认为 0
+                reminder.link,
+                reminder.amount,
+                reminder.currency,
+                reminder.monthly_amount,
+                reminder.yearly_amount
+            )
+            .run();
+
 
             // 创建定时任务URL（包含认证信息）
             const notifyUrl = `${url.origin}/api/notify?key=${env.CRON_SECRET}&id=${reminder.id}`;
