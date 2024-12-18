@@ -34,17 +34,17 @@
         <div class="total-expenses-card">
             <div class="expense-item">
                 <p class="expense-title">月度总支出</p>
-                <p class="expense-value" id="totalMonthly">¥568.23</p>
+                <p class="expense-value" id="totalMonthly">0</p>
             </div>
             <div class="divider"></div>
             <div class="expense-item">
                 <p class="expense-title">年度总支出</p>
-                <p class="expense-value" id="totalYearly">¥568.23 CNY</p>
+                <p class="expense-value" id="totalYearly">0</p>
             </div>
             <div class="divider"></div>
             <div class="expense-item">
                 <p class="expense-title">服务器数量</p>
-                <p class="expense-value" id="totalMachine">¥568.23 CNY</p>
+                <p class="expense-value" id="totalMachine">0</p>
             </div>
         </div>
 
@@ -231,7 +231,8 @@
             fetchExchangeRates();
 
             const rate = exchangeRates[currency] || 1; // 获取汇率，如果没有则默认 1
-            return parseFloat((amount * rate).toFixed(2)); // 返回浮点数
+            console.log('[SUCCESS] rate:', exchangeRates);
+            return parseFloat((amount / rate).toFixed(2)); // 返回浮点数
         }
 
         function calculateTotalExpenses(reminders) {
