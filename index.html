@@ -34,7 +34,7 @@
         <div class="total-expenses-card">
             <div class="expense-item">
                 <p class="expense-title">月度总支出</p>
-                <p class="expense-value" id="totalMonthly">¥568.23 CNY</p>
+                <p class="expense-value" id="totalMonthly">¥568.23</p>
             </div>
             <div class="divider"></div>
             <div class="expense-item">
@@ -147,6 +147,42 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/zh.js"></script>
     <script>
+        // 定义全局变量存储汇率和最后获取时间
+        let exchangeRates = {};
+        let lastFetchTime = null;
+        function getCurrentDate() {
+            const now = new Date();
+            return now.toISOString().split('T')[0];
+        }
+
+        // 获取实时汇率的函数
+        // 获取实时汇率（仅在每天第一次调用时执行）
+        function fetchExchangeRates() {
+            const today = getCurrentDate();
+
+            // 如果当天已获取过汇率，直接返回
+            if (lastFetchTime === today) {
+                console.log('[INFO] 使用缓存的汇率:', exchangeRates);
+                return;
+            }
+
+            // 发起网络请求获取汇率
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', 'https://v6.exchangerate-api.com/v6/d0705f1a65d2749fc5936275/latest/USD', false); // false -> 同步请求
+            xhr.send(null);
+
+            if (xhr.status === 200) {
+                const data = JSON.parse(xhr.responseText);
+                if (data.result === 'success') {
+                    exchangeRates = data.conversion_rates; // 缓存汇率
+                    lastFetchTime = today; // 更新获取时间
+                    console.log('[SUCCESS] 实时汇率已更新:', exchangeRates);
+                }
+            } else {
+                console.error('[ERROR] 无法获取汇率，使用默认值');
+                exchangeRates = { USD: 7.3, EUR: 7.8, CNY: 1 }; // 使用默认汇率
+            }
+        }
         // 快速时间设置函数
         function setQuickTime(minutes) {
             const now = new Date();
@@ -188,10 +224,14 @@
             const minutes = String(date.getMinutes()).padStart(2, '0');
             return `${year}-${month}-${day}T${hours}:${minutes}`;
         }
-        //  将金额转为RMB的汇率转换函数
+
+        // 将金额转换为人民币
         function convertToRMB(amount, currency) {
-            const rates = { USD: 7.3, EUR: 7.8, CNY: 1 }; // 示例汇率，可根据需要动态获取
-            return amount * (rates[currency] || 1);
+            // 确保已获取汇率
+            fetchExchangeRates();
+
+            const rate = exchangeRates[currency] || 1; // 获取汇率，如果没有则默认 1
+            return (amount * rate).toFixed(2); // 转换并保留两位小数
         }
 
         function calculateTotalExpenses(reminders) {
@@ -201,20 +241,21 @@
             let totalMachine = 0;
             reminders.forEach(reminder => {
                 totalMachine++;
+
                 const amountInRMB = convertToRMB(reminder.amount, reminder.currency);
                 if (reminder.cycle_type === 'monthly') {
                     totalMonthly += amountInRMB;
                     totalYearly += amountInRMB * 12;
 
                 } else if (reminder.cycle_type === 'yearly') {
-                    totalMonthly += parseFloat((reminder.amount / 12).toFixed(2));
+                    totalMonthly += parseFloat((amountInRMB / 12).toFixed(2));
                     totalYearly += amountInRMB;
                 }
             });
 
-            document.getElementById('totalMonthly').textContent = `¥${totalMonthly.toFixed(2)} RMB`;
-            document.getElementById('totalYearly').textContent = `¥${totalYearly.toFixed(2)} RMB`;
-            document.getElementById('totalMachine').textContent = totalMachine;
+            document.getElementById('totalMonthly').textContent = `¥${totalMonthly.toFixed(2)}`;
+            document.getElementById('totalYearly').textContent = `¥${totalYearly.toFixed(2)}`;
+            document.getElementById('totalMachine').textContent = reminders.length;
         }
 
         // 使用相对路径，自动适应当前域名
@@ -437,8 +478,9 @@
                         'monthly': '每月循环',
                         'yearly': '每年循环'
                     }[reminder.cycle_type] || '单次提醒';
-                    const monthlyAmount = reminder.cycle_type === 'monthly' ? convertToRMB(reminder.amount, reminder.currency) : parseFloat((reminder.amount / 12).toFixed(2));
-                    const yearlyAmount = reminder.cycle_type === 'yearly' ? convertToRMB(reminder.amount, reminder.currency) : monthlyAmount * 12;
+                    const amount = convertToRMB(reminder.amount, reminder.currency);
+                    const monthlyAmount = reminder.cycle_type === 'monthly' ? amount : parseFloat((amount / 12).toFixed(2));
+                    const yearlyAmount = reminder.cycle_type === 'yearly' ? amount : monthlyAmount * 12;
 
                     // 计算下一次提醒时间
                     let nextRemindTime = null;
@@ -597,7 +639,7 @@
                     },
                     body: JSON.stringify({ password })
                 });
-                
+
                 if (response.ok) {
                     document.getElementById('password-overlay').style.display = 'none';
                     document.body.classList.remove('locked'); // 移除锁定
@@ -614,7 +656,7 @@
         }
 
         // 检查cookie
-        window.onload = function() {
+        window.onload = function () {
             // 如果已经有 auth cookie，直接移除锁定状态
             if (document.cookie.includes('auth=true')) {
                 document.getElementById('password-overlay').style.display = 'none';
@@ -630,23 +672,23 @@
                 },
                 body: JSON.stringify({ password: '' })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // 如果服务器没有设置密码，直接设置cookie
-                    const expiryDate = new Date();
-                    expiryDate.setDate(expiryDate.getDate() + 30);
-                    document.cookie = `auth=true; expires=${expiryDate.toUTCString()}; path=/`;
-                    document.body.classList.remove('locked');
-                } else {
-                    // 如果需要密码且没有验证过，显示密码输入框
-                    document.getElementById('password-overlay').style.display = 'flex';
-                    document.body.classList.add('locked');
-                }
-            })
-            .catch(error => {
-                console.error('Error checking password requirement:', error);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 如果服务器没有设置密码，直接设置cookie
+                        const expiryDate = new Date();
+                        expiryDate.setDate(expiryDate.getDate() + 30);
+                        document.cookie = `auth=true; expires=${expiryDate.toUTCString()}; path=/`;
+                        document.body.classList.remove('locked');
+                    } else {
+                        // 如果需要密码且没有验证过，显示密码输入框
+                        document.getElementById('password-overlay').style.display = 'flex';
+                        document.body.classList.add('locked');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking password requirement:', error);
+                });
         }
     </script>
 </body>
