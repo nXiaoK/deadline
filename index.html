@@ -31,11 +31,22 @@
             </div>
             <button id="openAddForm" class="add-button">📑添加新提醒</button>
         </div>
-        <div class="total-expenses">
-            <p id="totalMonthly">总每月消费: 0.00 RMB</p>
-            <p id="totalYearly">总每年消费: 0.00 RMB</p>
+        <div class="total-expenses-card">
+            <div class="expense-item">
+                <p class="expense-title">月度总支出</p>
+                <p class="expense-value" id="totalMonthly">¥568.23 CNY</p>
+            </div>
+            <div class="divider"></div>
+            <div class="expense-item">
+                <p class="expense-title">年度总支出</p>
+                <p class="expense-value" id="totalYearly">¥568.23 CNY</p>
+            </div>
+            <div class="divider"></div>
+            <div class="expense-item">
+                <p class="expense-title">服务器数量</p>
+                <p class="expense-value" id="totalMachine">¥568.23 CNY</p>
+            </div>
         </div>
-        
 
         <!-- 出式添加提醒表单 -->
         <div id="addFormModal" class="modal">
@@ -187,19 +198,23 @@
             let totalMonthly = 0;
             let totalYearly = 0;
 
+            let totalMachine = 0;
             reminders.forEach(reminder => {
+                totalMachine++;
                 const amountInRMB = convertToRMB(reminder.amount, reminder.currency);
                 if (reminder.cycle_type === 'monthly') {
                     totalMonthly += amountInRMB;
+                    totalYearly += amountInRMB * 12;
+
                 } else if (reminder.cycle_type === 'yearly') {
+                    totalMonthly += parseFloat((reminder.amount / 12).toFixed(2));
                     totalYearly += amountInRMB;
                 }
             });
 
-            totalYearly += totalMonthly * 12;
-
-            document.getElementById('totalMonthly').textContent = `总每月消费: ${totalMonthly.toFixed(2)} RMB`;
-            document.getElementById('totalYearly').textContent = `总每年消费: ${totalYearly.toFixed(2)} RMB`;
+            document.getElementById('totalMonthly').textContent = `¥${totalMonthly.toFixed(2)} RMB`;
+            document.getElementById('totalYearly').textContent = `¥${totalYearly.toFixed(2)} RMB`;
+            document.getElementById('totalMachine').textContent = totalMachine;
         }
 
         // 使用相对路径，自动适应当前域名
@@ -310,7 +325,7 @@
                 remind_time: localToUTC(remindTime),
                 cycle_type: cycleType,
                 status: 0,
-                link: link || 'https://github.com/1143520/deadline',
+                link: link || '#',
                 amount,
                 currency,
                 monthly_amount: monthlyAmount,
@@ -422,7 +437,7 @@
                         'monthly': '每月循环',
                         'yearly': '每年循环'
                     }[reminder.cycle_type] || '单次提醒';
-                    const monthlyAmount = reminder.cycle_type === 'monthly' ? convertToRMB(reminder.amount, reminder.currency) : 0;
+                    const monthlyAmount = reminder.cycle_type === 'monthly' ? convertToRMB(reminder.amount, reminder.currency) : parseFloat((reminder.amount / 12).toFixed(2));
                     const yearlyAmount = reminder.cycle_type === 'yearly' ? convertToRMB(reminder.amount, reminder.currency) : monthlyAmount * 12;
 
                     // 计算下一次提醒时间
