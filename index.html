@@ -231,7 +231,7 @@
             fetchExchangeRates();
 
             const rate = exchangeRates[currency] || 1; // 获取汇率，如果没有则默认 1
-            return (amount * rate).toFixed(2); // 转换并保留两位小数
+            return parseFloat((amount * rate).toFixed(2)); // 返回浮点数
         }
 
         function calculateTotalExpenses(reminders) {
