@@ -38,7 +38,7 @@ export async function onRequest(context) {
 
             // 插入数据
             await env.DB.prepare(
-                'INSERT INTO reminders (id, title, content, remind_time, cycle_type, status, link, amount, currency, monthly_amount, yearly_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                'INSERT INTO reminders (id, title, content, remind_time, cycle_type, status, link, amount, currency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
             )
             .bind(
                 reminder.id,
@@ -49,9 +49,7 @@ export async function onRequest(context) {
                 0, // status 默认为 0
                 reminder.link,
                 reminder.amount,
-                reminder.currency,
-                reminder.monthly_amount,
-                reminder.yearly_amount
+                reminder.currency
             )
             .run();
 
