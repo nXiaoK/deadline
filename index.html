@@ -394,8 +394,7 @@
                 listElement.innerHTML = '';
 
 
-                const monthlyAmount = reminder.cycle_type === 'monthly' ? convertToRMB(reminder.amount, reminder.currency) : 0;
-                const yearlyAmount = reminder.cycle_type === 'yearly' ? convertToRMB(reminder.amount, reminder.currency) : monthlyAmount * 12;
+
                 reminders.sort((a, b) => new Date(a.remind_time) - new Date(b.remind_time));
                 reminders.forEach(reminder => {
                     const cycleText = {
@@ -404,6 +403,8 @@
                         'monthly': '每月循环',
                         'yearly': '每年循环'
                     }[reminder.cycle_type] || '单次提醒';
+                    const monthlyAmount = reminder.cycle_type === 'monthly' ? convertToRMB(reminder.amount, reminder.currency) : 0;
+                    const yearlyAmount = reminder.cycle_type === 'yearly' ? convertToRMB(reminder.amount, reminder.currency) : monthlyAmount * 12;
 
                     // 计算下一次提醒时间
                     let nextRemindTime = null;
