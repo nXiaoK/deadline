@@ -49,7 +49,7 @@ CREATE TABLE reminders (
 - `TG_CHAT_ID`: Telegram Chat ID（可选）
 - `WECOM_KEY`: 企业微信 Webhook 地址（可选）
 
-## 使用 [ExchangeRate-API](https://www.exchangerate-api.com/)，获取一个免费的 API Key。
+## 使用 [ExchangeRate-API](https://www.exchangerate-api.com/)，获取一个免费的 API Key用来动态获取货币费率。
 
 ## 部署步骤
 
