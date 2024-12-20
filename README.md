@@ -33,6 +33,8 @@ CREATE TABLE reminders (
     cycle_type TEXT NOT NULL,
     status INTEGER DEFAULT 0,
     link TEXT,
+    amount REAL DEFAULT 0.0,
+    currency TEXT DEFAULT 'CNY',
     cron_job_id INTEGER
 );
 ```
@@ -46,6 +48,8 @@ CREATE TABLE reminders (
 - `TG_BOT_TOKEN`: Telegram Bot Token（可选）
 - `TG_CHAT_ID`: Telegram Chat ID（可选）
 - `WECOM_KEY`: 企业微信 Webhook 地址（可选）
+
+## 使用 [ExchangeRate-API](https://www.exchangerate-api.com/)，获取一个免费的 API Key。
 
 ## 部署步骤
 
