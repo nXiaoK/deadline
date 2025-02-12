@@ -496,7 +496,7 @@
                     const currentTime = new Date(reminder.remind_time);
                     const now = new Date();
 
-                    if (reminder.status === 1 && reminder.cycle_type !== 'once') {
+                    if (reminder.status > 0 && reminder.cycle_type !== 'once') {
                         nextRemindTime = calculateNextRemindTime(reminder.remind_time, reminder.cycle_type,reminder.status);
                     }
 
