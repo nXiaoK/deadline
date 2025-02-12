@@ -135,7 +135,7 @@ export async function onRequest(context) {
         const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
         // 更新提醒状态为已发送
         await env.DB.prepare(
-            'UPDATE reminders SET status = 1,last_reminder_time = ? WHERE id = ?'
+            'UPDATE reminders SET status = status + 1,last_reminder_time = ? WHERE id = ?'
         ).bind(currentTime,reminderId).run();
 
 
