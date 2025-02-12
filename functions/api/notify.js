@@ -37,7 +37,7 @@ export async function onRequest(context) {
         // 发送到Telegram
         if (env.TG_BOT_TOKEN && env.TG_CHAT_ID) {
             try {
-                const displayTime = new Date(new Date(reminder.remind_time).getTime());
+                const displayTime = new Date();
                 const cycleText = {
                     'once': '单次提醒',
                     'weekly': '每周循环',
