@@ -38,13 +38,22 @@ export async function onRequest(context) {
         if (env.TG_BOT_TOKEN && env.TG_CHAT_ID) {
             try {
                 const displayTime = new Date();
+                const shanghaiTime = new Intl.DateTimeFormat('zh-CN', {
+                    timeZone: 'Asia/Shanghai', // 指定时区为北京时间
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                }).format(displayTime);
                 const cycleText = {
                     'once': '单次提醒',
                     'weekly': '每周循环',
                     'monthly': '每月循环',
                     'yearly': '每年循环'
                 }[reminder.cycle_type] || '单次提醒';
-                const tgMessage = `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${displayTime.toLocaleString('zh-CN')}\n\n📅 循环类型：${cycleText}`;
+                const tgMessage = `🔔 提醒：${reminder.title}\n\n${reminder.content}\n\n⏰ 提醒时间：${shanghaiTime}\n\n📅 循环类型：${cycleText}`;
                 const tgResponse = await fetch(`https://api.telegram.org/bot${env.TG_BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
