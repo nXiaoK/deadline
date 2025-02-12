@@ -24,7 +24,7 @@ export async function onRequest(context) {
     try {
         // 获取提醒详情
         const { results } = await env.DB.prepare(
-            'SELECT * FROM reminders WHERE id = ? AND status = 0'
+            'SELECT * FROM reminders WHERE id = ?'
         ).bind(reminderId).all();
 
         if (!results || results.length === 0) {
@@ -131,11 +131,13 @@ export async function onRequest(context) {
                 notificationResults.push({ platform: 'bark', success: false, error: error.message });
             }
         }
-
+        // 获取当前时间并格式化为 YYYY-MM-DD HH:mm:ss 格式
+        const currentTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
         // 更新提醒状态为已发送
         await env.DB.prepare(
-            'UPDATE reminders SET status = 1 WHERE id = ?'
-        ).bind(reminderId).run();
+            'UPDATE reminders SET status = 1,last_reminder_time = ? WHERE id = ?'
+        ).bind(currentTime,reminderId).run();
+
 
         // 只有单次提醒才删除定时任务
         if (reminder.cycle_type === 'once' && reminder.cron_job_id && env.CRONJOB_API_KEY) {
